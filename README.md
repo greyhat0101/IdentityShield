@@ -29,12 +29,12 @@ A Flask-based Data Breach Detection and Cybersecurity Awareness platform that ch
 
 ## Environment Variables
 Create a .env file with these variables:
-SECRET_KEY=
-ADMIN_EMAIL=
-ADMIN_PASSWORD=
-NEWS_API_KEY=
-MAIL_USERNAME=
-MAIL_PASSWORD=
+1. SECRET_KEY=
+2. ADMIN_EMAIL=
+3. ADMIN_PASSWORD=
+4. NEWS_API_KEY=
+5. MAIL_USERNAME=
+6. MAIL_PASSWORD=
 
 ## Database
 SQLite database auto-created on first run via schema.sql
