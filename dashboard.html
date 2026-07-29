@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IdentityShield — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+      <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <style>
+    .ticket-card{background:rgba(255,255,255,0.03);border:1px solid var(--border-subtle,rgba(255,255,255,0.08));border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+    .ticket-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;}
+    .ticket-subject{font-family:'Exo 2',sans-serif;font-weight:600;font-size:14px;color:var(--text-primary,#dde6f0);}
+    .ticket-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;padding:3px 10px;border-radius:12px;white-space:nowrap;}
+    .ticket-status-open{background:rgba(255,165,2,0.12);color:#ffa502;border:1px solid rgba(255,165,2,0.3);}
+    .ticket-status-answered{background:rgba(0,255,136,0.12);color:var(--green,#00ff88);border:1px solid rgba(0,255,136,0.3);}
+    .ticket-message{font-size:13px;color:var(--text-secondary,#8a9ab0);margin-bottom:8px;line-height:1.5;}
+    .ticket-reply{background:rgba(0,212,255,0.06);border-left:3px solid var(--cyan,#00d4ff);border-radius:6px;padding:10px 12px;margin-top:8px;}
+    .ticket-reply-label{font-size:10px;color:var(--cyan,#00d4ff);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:4px;}
+    .ticket-reply-text{font-size:13px;color:var(--text-primary,#dde6f0);line-height:1.5;}
+    .ticket-date{font-size:11px;color:var(--text-muted,#5a6b80);font-family:'Share Tech Mono',monospace;}
+  </style>
+</head>
+<body data-total-scans="{{ total_scans or 0 }}"
+      data-breaches-found="{{ breaches_found or 0 }}"
+      data-safe-accounts="{{ safe_accounts or 0 }}"
+      data-active-alerts="{{ active_alerts or 0 }}">
+<div class="grid-overlay"></div>
+ 
+<!-- TICKER BAR -->
+<div id="ticker-bar">
+  <div class="ticker-live">LIVE</div>
+  <div class="ticker-wrapper">
+    <div class="ticker-content">
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Adobe Breach: 153M records exposed</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>LinkedIn: 700M accounts on dark web</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Yahoo Breach: 3 Billion accounts affected</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>Security patch released for critical CVE-2025-0342</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Equifax: 147M Social Security numbers leaked</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>New ransomware variant targeting healthcare systems</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>CISA issues emergency directive for zero-day vulnerability</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Facebook: 533M phone numbers exposed in 2024 dump</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>Phishing campaigns up 340% in Q1 2025</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>MFA now mandatory for federal agencies</span>
+      <!-- duplicate for seamless loop -->
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Adobe Breach: 153M records exposed</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>LinkedIn: 700M accounts on dark web</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Yahoo Breach: 3 Billion accounts affected</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>Security patch released for critical CVE-2025-0342</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Equifax: 147M Social Security numbers leaked</span>
+    </div>
+  </div>
+</div>
+ 
+<!-- NAVBAR (unchanged) -->
+<nav id="main-nav">
+  <div class="d-flex align-items-center gap-3">
+    <div class="nav-logo">
+      <svg viewBox="0 0 40 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="shield-pulse">
+        <path d="M20 2L4 9V22C4 31.4 11 40.1 20 42C29 40.1 36 31.4 36 22V9L20 2Z" fill="rgba(0,255,136,0.12)" stroke="#00ff88" stroke-width="1.5"/>
+        <path d="M20 8L10 13V22C10 27.8 14.5 33.2 20 34.8C25.5 33.2 30 27.8 30 22V13L20 8Z" fill="rgba(0,255,136,0.08)" stroke="#00ff88" stroke-width="1" opacity="0.6"/>
+        <path d="M16 21L19 24L25 18" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="brand-text">IDENTITY<span>SHIELD</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="/" class="active">Home</a>
+    <a href="/scanner" onclick="requireLogin(event,'/scanner')">Scan</a>
+    <a href="/awareness">Awareness</a>
+    <a href="/contact">Contact</a>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <div id="nav-login-area">
+      <button class="btn-login px-3 py-2" onclick="openModal()"><i class="fas fa-lock me-1"></i> Login</button>
+    </div>
+    <div id="nav-profile-area" style="display:none;position:relative;">
+      <button class="btn-profile" onclick="toggleProfileDropdown()">
+        <div class="profile-avatar" id="nav-avatar">K</div>
+        <span id="nav-username">Kiran</span>
+        <i class="fas fa-chevron-down ms-1" style="font-size:10px;"></i>
+      </button>
+      <div class="profile-dropdown" id="profile-dropdown">
+        <div class="profile-dropdown-header">
+          <div class="profile-dropdown-avatar" id="dropdown-avatar">K</div>
+          <div>
+            <div class="profile-dropdown-name" id="dropdown-name">Kiran</div>
+            <div class="profile-dropdown-email" id="dropdown-email">kiran@email.com</div>
+          </div>
+        </div>
+        <div class="profile-dropdown-divider"></div>
+        <a href="/dashboard" onclick="requireLogin(event,'/dashboard')" class="profile-dropdown-item"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="/scanner" onclick="requireLogin(event,'/scanner')" class="profile-dropdown-item"><i class="fas fa-search"></i> Scan Email</a>
+        <div class="profile-dropdown-divider"></div>
+        <a href="#" onclick="logoutUser()" class="profile-dropdown-item text-danger-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+    <button class="hamburger" onclick="toggleMobile()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+ 
+<!-- MOBILE MENU (unchanged) -->
+<div id="mobile-menu">
+  <button class="menu-close" onclick="toggleMobile()"><i class="fas fa-times"></i></button>
+  <a href="/" onclick="toggleMobile()">Home</a>
+  <a href="/scanner" onclick="requireLogin(event,'/scanner');toggleMobile();">Scan</a>
+  <a href="/awareness" onclick="toggleMobile()">Awareness</a>
+  <a href="/contact" onclick="toggleMobile()">Contact</a>
+  <button class="btn-login px-4 py-2 mt-3" onclick="openModal();toggleMobile();">Login / Register</button>
+</div>
+ 
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+ 
+<!-- SIDEBAR TOGGLE BUTTON (mobile FAB) -->
+<button id="sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle Menu">
+  <i class="fas fa-bars"></i>
+</button>
+ 
+<div class="dashboard-wrapper">
+  <!-- SIDEBAR -->
+  <aside class="dashboard-sidebar" id="dashboard-sidebar">
+    <div class="sidebar-profile">
+      <div class="sidebar-avatar" id="sidebar-avatar">U</div>
+      <div class="sidebar-username" id="sidebar-username">Loading...</div>
+      <div class="sidebar-email" id="sidebar-email">user@email.com</div>
+      <div class="sidebar-badge" id="sidebar-badge">🟢 Secure</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Navigation</div>
+      <a href="#" class="sidebar-link active" onclick="showTab('overview');closeSidebar();"><i class="fas fa-tachometer-alt"></i> Overview</a>
+      <a href="#" class="sidebar-link" onclick="showTab('profile');closeSidebar();"><i class="fas fa-user-circle"></i> My Profile</a>
+      <a href="#" class="sidebar-link" onclick="showTab('history');closeSidebar();"><i class="fas fa-history"></i> Scan History</a>
+      <a href="#" class="sidebar-link" onclick="showTab('exposure');closeSidebar();"><i class="fas fa-exclamation-triangle"></i> Exposure Details</a>
+      <a href="#" class="sidebar-link" onclick="showTab('security');closeSidebar();"><i class="fas fa-shield-alt"></i> Security Tips</a>
+      <a href="#" class="sidebar-link" onclick="showTab('support');closeSidebar();loadSupportTickets();"><i class="fas fa-headset"></i> Support / Queries</a>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">Actions</div>
+      <a href="/scanner" class="sidebar-link scan-link"><i class="fas fa-search"></i> New Scan</a>
+      <a href="#" onclick="logoutUser()" class="sidebar-link logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-text">IDENTITY SHIELD </div>
+    </div>
+  </aside>
+ 
+  <!-- MAIN -->
+  <main class="dashboard-main">
+ 
+    <!-- ══════════════ OVERVIEW TAB ══════════════ -->
+    <div class="dash-tab active-tab" id="tab-overview">
+ 
+      <!-- Welcome Banner -->
+      <div class="welcome-banner reveal">
+        <div class="welcome-content">
+          <div class="welcome-left">
+            <div class="welcome-label">SECURITY DASHBOARD</div>
+            <div class="welcome-greeting" id="welcome-greeting">Good Morning,</div>
+            <div class="welcome-name" id="welcome-name">User! 👋</div>
+            <div class="welcome-sub">Here's your security status overview</div>
+            <button class="btn-new-scan" onclick="window.location.href='/scanner'">
+              <i class="fas fa-search"></i> New Scan
+            </button>
+          </div>
+          <!-- <div class="welcome-right d-none d-md-flex">
+            <div class="welcome-shield">
+              <svg viewBox="0 0 120 140" fill="none" width="90" height="105">
+                <path d="M60 4L8 26V66C8 96.4 30 124 60 132C90 124 112 96.4 112 66V26L60 4Z" fill="rgba(0,255,136,0.07)" stroke="#00ff88" stroke-width="2"/>
+                <path d="M46 66L55 76L78 54" stroke="#00ff88" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div class="shield-score" id="shield-score-display">--</div>
+            </div>
+          </div> -->
+        </div>
+      </div>
+ 
+      <!-- STAT CARDS -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3 reveal">
+          <div class="dash-stat-card card-blue">
+            <div class="dash-stat-icon"><i class="fas fa-search"></i></div>
+            <div class="dash-stat-num" id="stat-total-scans">0</div>
+            <div class="dash-stat-label">Total Scans</div>
+            <div class="dash-stat-trend">Start scanning...</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3 reveal reveal-delay-1">
+          <div class="dash-stat-card card-red">
+            <div class="dash-stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="dash-stat-num" id="stat-breaches">0</div>
+            <div class="dash-stat-label">Breaches Found</div>
+            <div class="dash-stat-trend" id="breach-trend">Keep monitoring</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3 reveal reveal-delay-2">
+          <div class="dash-stat-card card-green">
+            <div class="dash-stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="dash-stat-num" id="stat-safe">0</div>
+            <div class="dash-stat-label">Safe Accounts</div>
+            <div class="dash-stat-trend">Stay protected</div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3 reveal reveal-delay-3">
+          <div class="dash-stat-card card-violet">
+            <div class="dash-stat-icon"><i class="fas fa-bell"></i></div>
+            <div class="dash-stat-num" id="stat-alerts">0</div>
+            <div class="dash-stat-label">Active Alerts</div>
+            <div class="dash-stat-trend">Check now</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RISK SCORE + ACCOUNT STATUS -->
+      <div class="mid-row">
+        <div class="risk-score-card reveal">
+          <div class="risk-card-title">YOUR RISK SCORE</div>
+          <div class="circular-meter-wrap">
+            <svg class="circular-meter" viewBox="0 0 200 200" width="180" height="180">
+              <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="12"/>
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#00ff88" stroke-width="12" stroke-linecap="round" stroke-dasharray="502" stroke-dashoffset="502" id="risk-circle" transform="rotate(-90 100 100)"/>
+              <text x="100" y="95" text-anchor="middle" fill="#dde6f0" font-family="Orbitron,monospace" font-size="32" font-weight="900" id="risk-num-text">--</text>
+              <text x="100" y="118" text-anchor="middle" fill="#8a9ab0" font-family="Exo 2,sans-serif" font-size="11" letter-spacing="2">RISK SCORE</text>
+            </svg>
+          </div>
+          <div class="risk-status-label" id="risk-status-label">Calculating...</div>
+          <div class="risk-last-scan">Last scan: <span id="last-scan-date">Never</span></div>
+        </div>
+        <div class="account-status-card reveal reveal-delay-1">
+          <div class="asc-title">ACCOUNT SECURITY STATUS</div>
+          <div class="asc-items">
+            <div class="asc-item">
+              <div class="asc-label"><i class="fas fa-lock"></i> Password Strength</div>
+              <div class="asc-bar-wrap"><div class="asc-bar" style="width:70%;background:var(--cyan)"></div></div>
+              <div class="asc-val cyan-text">Medium</div>
+            </div>
+            <div class="asc-item">
+              <div class="asc-label"><i class="fas fa-mobile-alt"></i> MFA Status</div>
+              <div class="asc-bar-wrap"><div class="asc-bar" style="width:0%;background:var(--red)"></div></div>
+              <div class="asc-val red-text">Not Enabled</div>
+            </div>
+            <div class="asc-item">
+              <div class="asc-label"><i class="fas fa-eye"></i> Monitoring</div>
+              <div class="asc-bar-wrap"><div class="asc-bar" style="width:100%;background:var(--green)"></div></div>
+              <div class="asc-val green-text">Active</div>
+            </div>
+            <div class="asc-item">
+              <div class="asc-label"><i class="fas fa-envelope"></i> Recovery Email</div>
+              <div class="asc-bar-wrap"><div class="asc-bar" style="width:50%;background:#ffa502"></div></div>
+              <div class="asc-val" style="color:#ffa502">Needs Update</div>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- RECENT SCANS TABLE -->
+      <div class="dash-table-card reveal">
+        <div class="dash-table-header">
+          <div class="dash-table-title"><i class="fas fa-history me-2"></i>Recent Scan History</div>
+          <button class="btn-see-all" onclick="showTab('history')">See All →</button>
+        </div>
+        <div class="table-responsive">
+          <table class="dash-table">
+            <thead>
+              <tr><th>Date</th><th>Email Scanned</th><th>Platform</th><th>Result</th><th>Risk Score</th></tr>
+            </thead>
+            <tbody id="recent-scans-body">
+              <tr><td colspan="5" class="no-data">No scans yet. <a href="/scanner" class="modal-link">Scan your email now →</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+ 
+      <!-- EXPOSURE + TIPS -->
+      <div class="bottom-row">
+        <div class="exposure-card reveal">
+          <div class="exposure-title"><i class="fas fa-exclamation-triangle me-2" style="color:var(--red)"></i>Known Exposures</div>
+          <div id="exposure-list"><div style="text-align:center;padding:24px;color:var(--text-secondary);font-size:13px;"><i class="fas fa-spinner fa-spin" style="color:var(--cyan);margin-right:6px;"></i>Loading...</div></div>
+        </div>
+        <div class="security-tips-card reveal reveal-delay-1">
+          <div class="tips-title"><i class="fas fa-shield-alt me-2"></i>Security Recommendations</div>
+          <div class="tips-list">
+            <div class="tip-item tip-critical"><i class="fas fa-times-circle"></i><span>Change your LinkedIn password immediately</span></div>
+            <div class="tip-item tip-critical"><i class="fas fa-times-circle"></i><span>Enable MFA on all accounts</span></div>
+            <div class="tip-item tip-warning"><i class="fas fa-exclamation-circle"></i><span>Avoid reusing passwords across platforms</span></div>
+            <div class="tip-item tip-warning"><i class="fas fa-exclamation-circle"></i><span>Update your recovery email address</span></div>
+            <div class="tip-item tip-ok"><i class="fas fa-check-circle"></i><span>Monitoring is active — you're being watched over</span></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /overview -->
+ 
+    <!-- ══════════════ PROFILE TAB ══════════════ -->
+    <div class="dash-tab" id="tab-profile">
+      <div class="tab-header">
+        <div class="tab-header-title"><i class="fas fa-user-circle me-2" style="color:var(--cyan)"></i>My Profile</div>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-4 reveal">
+          <div class="profile-card text-center">
+            <div class="profile-big-avatar" id="profile-big-avatar">U</div>
+            <div class="profile-card-name" id="profile-card-name">User Name</div>
+            <div class="profile-card-email" id="profile-card-email">email@example.com</div>
+            <div class="profile-card-badge">🛡️ Protected Member</div>
+            <div class="profile-card-joined mt-1" id="profile-card-joined">Loading...</div>
+            <button class="btn-edit-profile mt-3" onclick="openEditProfile()"><i class="fas fa-edit me-1"></i>Edit Profile</button>
+          </div>
+        </div>
+        <div class="col-lg-8 reveal reveal-delay-1">
+          <div class="profile-info-card">
+            <div class="pi-title">Account Information</div>
+            <div class="pi-row"><span class="pi-label">Full Name</span><span class="pi-val" id="pi-name">—</span></div>
+            <div class="pi-row"><span class="pi-label">Email Address</span><span class="pi-val" id="pi-email">—</span></div>
+            <div class="pi-row"><span class="pi-label">Account Type</span><span class="pi-val" style="color:var(--green)">Free Plan</span></div>
+            <div class="pi-row"><span class="pi-label">Scans Performed</span><span class="pi-val" id="pi-scans">0</span></div>
+            <div class="pi-row"><span class="pi-label">Risk Level</span><span class="pi-val" id="pi-risk">Calculating...</span></div>
+            <div class="pi-row"><span class="pi-label">Last Active</span><span class="pi-val">Today</span></div>
+          </div>
+          <div class="profile-info-card mt-4">
+            <div class="pi-title">Security Settings</div>
+            <div class="security-toggle-row">
+              <div><div class="st-label">Two-Factor Authentication</div><div class="st-sub">Add extra security to your account</div></div>
+              <div class="toggle-switch" id="mfa-toggle" onclick="toggleSetting(this)"><div class="toggle-knob"></div></div>
+            </div>
+            <div class="security-toggle-row">
+              <div><div class="st-label">Email Breach Alerts</div><div class="st-sub">Get notified of new breaches</div></div>
+              <div class="toggle-switch active" id="alert-toggle" onclick="toggleSetting(this)"><div class="toggle-knob"></div></div>
+            </div>
+            <div class="security-toggle-row">
+              <div><div class="st-label">Weekly Security Report</div><div class="st-sub">Receive weekly digest</div></div>
+              <div class="toggle-switch" id="report-toggle" onclick="toggleSetting(this)"><div class="toggle-knob"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ══════════════ HISTORY TAB ══════════════ -->
+    <div class="dash-tab" id="tab-history">
+      <div class="tab-header">
+        <div class="tab-header-title"><i class="fas fa-history me-2" style="color:var(--cyan)"></i>Scan History</div>
+      </div>
+      <div class="history-filters">
+        <button class="hf-btn active" onclick="filterHistory('all',this)">All</button>
+        <button class="hf-btn" onclick="filterHistory('breach',this)">Breached</button>
+        <button class="hf-btn" onclick="filterHistory('safe',this)">Safe</button>
+      </div>
+      <div class="dash-table-card">
+        <div class="table-responsive">
+          <table class="dash-table">
+            <thead><tr><th>Date & Time</th><th>Email Scanned</th><th>Platform</th><th>Result</th><th>Risk Score</th>
+              <th>Action</th>
+            </tr></thead>
+            <tbody id="full-history-body">
+              <tr><td colspan="6" class="no-data">No scan history yet. <a href="/scanner" class="modal-link">Start scanning →</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ══════════════ EXPOSURE TAB ══════════════ -->
+    <div class="dash-tab" id="tab-exposure">
+      <div class="tab-header">
+        <div class="tab-header-title"><i class="fas fa-exclamation-triangle me-2" style="color:var(--red)"></i>Exposure Details</div>
+        <div id="exposure-scan-meta" style="font-size:12px;color:var(--text-secondary);margin-top:4px;font-family:'Share Tech Mono',monospace;"></div>
+      </div>
+      <!-- Cards are injected here by JS -->
+      <div id="exposure-cards-container">
+        <div class="no-data" style="padding:48px;text-align:center;">
+          <i class="fas fa-search" style="font-size:32px;color:var(--cyan);margin-bottom:12px;display:block;"></i>
+          Click the <i class="fas fa-eye"></i> icon on any scan in <strong>Scan History</strong> to view its breach details here.
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ══════════════ SECURITY TIPS TAB ══════════════ -->
+    <div class="dash-tab" id="tab-security">
+      <div class="tab-header">
+        <div class="tab-header-title"><i class="fas fa-shield-alt me-2" style="color:var(--green)"></i>Security Recommendations</div>
+      </div>
+      <div class="row g-4">
+        <div class="col-lg-6 col-12 reveal">
+          <div class="sec-tip-card critical-tip">
+            <div class="tip-card-icon">🔑</div>
+            <div class="tip-card-title">Change Compromised Passwords</div>
+            <div class="tip-card-desc">Immediately change passwords for all breached accounts. Use a password manager to create unique 16+ character passwords.</div>
+            <div class="tip-priority critical-p">CRITICAL — Do This Now</div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-12 reveal reveal-delay-1">
+          <div class="sec-tip-card critical-tip">
+            <div class="tip-card-icon">📱</div>
+            <div class="tip-card-title">Enable Multi-Factor Authentication</div>
+            <div class="tip-card-desc">Add MFA to every account that supports it. This single step blocks 99.9% of automated attacks even if passwords are stolen.</div>
+            <div class="tip-priority critical-p">CRITICAL — Do This Now</div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-12 reveal">
+          <div class="sec-tip-card warning-tip">
+            <div class="tip-card-icon">🔒</div>
+            <div class="tip-card-title">Use Unique Passwords</div>
+            <div class="tip-card-desc">Never reuse passwords. If one account is breached, hackers try the same credentials on other sites — called credential stuffing.</div>
+            <div class="tip-priority warning-p">IMPORTANT</div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-12 reveal reveal-delay-1">
+          <div class="sec-tip-card warning-tip">
+            <div class="tip-card-icon">📧</div>
+            <div class="tip-card-title">Update Recovery Email</div>
+            <div class="tip-card-desc">Keep your recovery email and phone number updated. This ensures you can regain access if your account is compromised.</div>
+            <div class="tip-priority warning-p">IMPORTANT</div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-12 reveal">
+          <div class="sec-tip-card ok-tip">
+            <div class="tip-card-icon">🔔</div>
+            <div class="tip-card-title">Set Up Login Alerts</div>
+            <div class="tip-card-desc">Enable login notifications so you are alerted immediately if someone signs into your accounts from an unfamiliar device or location.</div>
+            <div class="tip-priority ok-p">RECOMMENDED</div>
+          </div>
+        </div>
+        <div class="col-lg-6 col-12 reveal reveal-delay-1">
+          <div class="sec-tip-card ok-tip">
+            <div class="tip-card-icon">🌐</div>
+            <div class="tip-card-title">Use a VPN on Public Wi-Fi</div>
+            <div class="tip-card-desc">Public Wi-Fi networks are vulnerable to man-in-the-middle attacks. Always use a VPN when connecting outside your home network.</div>
+            <div class="tip-priority ok-p">RECOMMENDED</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ SUPPORT / QUERIES TAB ══════════════ -->
+    <div class="dash-tab" id="tab-support">
+      <div class="tab-header">
+        <div class="tab-header-title"><i class="fas fa-headset me-2" style="color:var(--cyan)"></i>Support / Queries</div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <div class="profile-info-card">
+            <div class="pi-title">Submit a New Query</div>
+            <div style="margin-bottom:14px;">
+              <label style="font-size:12px;color:var(--text-secondary);font-family:'Share Tech Mono',monospace;letter-spacing:1px;display:block;margin-bottom:8px;">SUBJECT</label>
+              <input id="ticket-subject" type="text" placeholder="e.g. Scan not showing results"
+                style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-family:'Exo 2',sans-serif;font-size:14px;outline:none;"/>
+            </div>
+            <div style="margin-bottom:14px;">
+              <label style="font-size:12px;color:var(--text-secondary);font-family:'Share Tech Mono',monospace;letter-spacing:1px;display:block;margin-bottom:8px;">YOUR MESSAGE</label>
+              <textarea id="ticket-message" rows="5" placeholder="Describe your issue or question in detail..."
+                style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-family:'Exo 2',sans-serif;font-size:14px;outline:none;resize:vertical;"></textarea>
+            </div>
+            <div id="ticket-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:12px;padding:8px 12px;background:rgba(255,71,87,0.08);border-radius:6px;border:1px solid rgba(255,71,87,0.2);"></div>
+            <button id="submit-ticket-btn" onclick="submitTicket()" class="btn-new-scan" style="width:100%;justify-content:center;">
+              <i class="fas fa-paper-plane"></i> Submit Query
+            </button>
+          </div>
+        </div>
+
+        <div class="col-lg-7">
+          <div class="dash-table-card" style="height:100%;">
+            <div class="dash-table-header">
+              <div class="dash-table-title"><i class="fas fa-list me-2"></i>Your Queries</div>
+            </div>
+            <div id="tickets-list" style="padding:8px;">
+              <div class="no-data" style="padding:32px;text-align:center;">
+                <i class="fas fa-spinner fa-spin" style="color:var(--cyan);margin-right:6px;"></i>Loading your queries...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+  </main>
+</div>
+ 
+<!-- ══════════════ FOOTER (unchanged structure, fixed positioning) ══════════════ -->
+<!-- FOOTER -->
+<footer id="footer" class="py-4">
+  <div class="container">
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <svg width="28" height="32" viewBox="0 0 40 44" fill="none" class="shield-pulse">
+            <path d="M20 2L4 9V22C4 31.4 11 40.1 20 42C29 40.1 36 31.4 36 22V9L20 2Z" fill="rgba(0,255,136,0.12)" stroke="#00ff88" stroke-width="1.5"/>
+            <path d="M16 21L19 24L25 18" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="brand-text">IDENTITY<span>SHIELD</span></span>
+        </div>
+        <p class="footer-desc">Protecting digital identities with real-time breach detection and intelligent risk analysis.</p>
+      </div>
+      <div class="col-md-2">
+        <div class="footer-heading mb-3">PLATFORM</div>
+        <a href="/scanner" onclick="requireLogin(event,'/scanner')" class="footer-link d-block mb-2">Scan Email</a>
+        <a href="/dashboard" onclick="requireLogin(event,'/dashboard')" class="footer-link d-block mb-2">Dashboard</a>
+        <a href="/awareness" class="footer-link d-block mb-2">Awareness</a>
+      </div>
+      <div class="col-md-2">
+        <div class="footer-heading mb-3">COMPANY</div>
+        <a href="/index" class="footer-link d-block mb-2">About Us</a>
+        <a href="/contact" class="footer-link d-block mb-2">Contact</a>
+        <a href="#" class="footer-link d-block mb-2">Privacy Policy</a>
+      </div>
+      <div class="col-md-4">
+        <div class="footer-heading mb-3">GET IN TOUCH</div>
+        <a href="mailto:identityshield.support@gmail.com" class="footer-link d-block mb-2"><i class="fas fa-envelope me-2"></i>identityshield.support@gmail.com</a>
+        <div class="footer-link mb-3"><i class="fas fa-map-marker-alt me-2"></i>Jodhpur, Rajasthan, India</div>
+        <div class="footer-social-icons">
+          <a href="#" class="footer-social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="footer-social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="footer-social-icon" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" class="footer-social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="mb-0">© 2026 <span>IdentityShield</span> — All Rights Reserved &nbsp;·&nbsp; Designed &amp; developed with <span class="heart">♥</span> by <span>Kiran &amp; Tanisha</span></p>
+    </div>
+  </div>
+</footer>
+      
+ 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+<!-- ══ EDIT PROFILE MODAL ══ -->
+<div id="edit-profile-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(2,8,19,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:#0a0f1e;border:1px solid rgba(0,212,255,0.25);border-radius:16px;padding:36px 32px;width:100%;max-width:440px;margin:20px;box-shadow:0 0 40px rgba(0,212,255,0.1);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div style="font-family:Orbitron,monospace;font-size:15px;font-weight:700;color:var(--cyan);letter-spacing:2px;"><i class="fas fa-user-edit me-2"></i>EDIT PROFILE</div>
+      <button onclick="closeEditProfile()" style="background:none;border:none;color:var(--text-secondary);font-size:18px;cursor:pointer;"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="margin-bottom:18px;">
+      <label style="font-size:12px;color:var(--text-secondary);font-family:Share Tech Mono,monospace;letter-spacing:1px;display:block;margin-bottom:8px;">USERNAME</label>
+      <input id="edit-username-input" type="text" placeholder="Enter new username"
+        style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-family:Exo 2,sans-serif;font-size:14px;outline:none;"
+        onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"
+      />
+    </div>
+    <div style="margin-bottom:24px;">
+      <label style="font-size:12px;color:var(--text-secondary);font-family:Share Tech Mono,monospace;letter-spacing:1px;display:block;margin-bottom:8px;">EMAIL ADDRESS <span style="color:var(--text-muted);font-size:10px;">(cannot be changed)</span></label>
+      <div id="edit-email-display" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px 14px;color:var(--text-secondary);font-family:Share Tech Mono,monospace;font-size:13px;">—</div>
+    </div>
+    <div id="edit-profile-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:14px;padding:8px 12px;background:rgba(255,71,87,0.08);border-radius:6px;border:1px solid rgba(255,71,87,0.2);"></div>
+    <div style="display:flex;gap:12px;">
+      <button onclick="closeEditProfile()" style="flex:1;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text-secondary);font-family:Exo 2,sans-serif;cursor:pointer;">Cancel</button>
+      <button id="save-profile-btn" onclick="saveProfile()" style="flex:2;padding:10px;background:rgba(0,212,255,0.12);border:1px solid var(--cyan);border-radius:8px;color:var(--cyan);font-family:Orbitron,monospace;font-size:12px;letter-spacing:1px;cursor:pointer;"><i class="fas fa-save me-1"></i> Save Changes</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

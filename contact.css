@@ -1,0 +1,162 @@
+.bg-main{background:var(--bg-main);}
+.bg-secondary-section{background:var(--bg-secondary);}
+.about-hero{min-height:360px;background:linear-gradient(180deg,var(--bg-secondary),var(--bg-main));position:relative;overflow:hidden;display:flex;align-items:center;padding:120px 0 60px;}
+#about-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+.page-badge{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--green);border:1px solid var(--border);padding:5px 14px;border-radius:2px;display:inline-block;margin-bottom:16px;background:rgba(0,255,136,.05);}
+.about-hero-title{font-family:'Orbitron',monospace;font-size:clamp(24px,4vw,52px);font-weight:900;color:var(--text-primary);line-height:1.1;margin-bottom:12px;}
+.about-hero-title span{color:var(--green);}
+.about-hero-sub{color:var(--text-secondary);font-size:clamp(13px,1.8vw,16px);max-width:480px;margin:0 auto;}
+.about-section-title{font-family:'Orbitron',monospace;font-size:clamp(18px,3vw,28px);font-weight:800;color:var(--text-primary);}
+.about-section-title span{color:var(--green);}
+.about-text{color:var(--text-secondary);font-size:clamp(14px,1.8vw,16px);line-height:1.8;}
+.mission-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px;padding:20px;transition:all .3s;}
+.mission-card:hover{transform:translateY(-4px);border-color:var(--border-hover);}
+.mc-icon{font-size:26px;margin-bottom:10px;}
+.mc-title{font-family:'Orbitron',monospace;font-size:11px;color:var(--text-primary);letter-spacing:2px;margin-bottom:6px;}
+.mc-desc{font-size:12px;color:var(--text-muted);line-height:1.5;}
+.mc-green:hover{border-color:rgba(0,255,136,.3);}
+.mc-cyan:hover{border-color:rgba(0,212,255,.3);}
+.mc-violet:hover{border-color:rgba(192,132,252,.3);}
+.mc-red:hover{border-color:rgba(255,71,87,.3);}
+.tech-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px;padding:20px;text-align:center;transition:all .3s;}
+.tech-card:hover{transform:translateY(-4px);border-color:var(--border-hover);box-shadow:0 10px 30px rgba(0,0,0,.3);}
+.tech-icon{font-size:28px;margin-bottom:10px;}
+.tech-name{font-family:'Orbitron',monospace;font-size:10px;color:var(--green);letter-spacing:2px;margin-bottom:4px;}
+.tech-sub{font-size:11px;color:var(--text-muted);}
+.contact-info-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;padding:28px;height:100%;}
+.ci-item{display:flex;align-items:flex-start;gap:14px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.ci-item:last-child{border-bottom:none;}
+.ci-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.email-icon{background:rgba(0,212,255,.1);color:var(--cyan);border:1px solid rgba(0,212,255,.2);}
+.phone-icon{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.2);}
+.loc-icon{background:rgba(192,132,252,.1);color:var(--violet);border:1px solid rgba(192,132,252,.2);}
+.time-icon{background:rgba(255,165,0,.1);color:#ffa502;border:1px solid rgba(255,165,0,.2);}
+.ci-label{font-family:'Exo 2',sans-serif;font-size:11px;letter-spacing:1px;color:var(--text-muted);margin-bottom:3px;text-transform:uppercase;}
+.ci-val{font-family:'Rajdhani',sans-serif;font-size:14px;color:var(--text-primary);}
+.contact-form-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;padding:28px;}
+.cf-title{font-family:'Orbitron',monospace;font-size:14px;color:var(--text-primary);letter-spacing:2px;margin-bottom:20px;}
+.btn-send-message{background:var(--green);color:#03050d;border:none;border-radius:8px;padding:14px 28px;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .3s;box-shadow:0 0 20px var(--glow-green);}
+.btn-send-message:hover{transform:translateY(-2px);box-shadow:0 0 40px var(--glow-green);}
+.faq-item{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px;margin-bottom:12px;overflow:hidden;cursor:pointer;transition:border-color .3s;}
+.faq-item:hover{border-color:var(--border-hover);}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;font-family:'Exo 2',sans-serif;font-size:14px;font-weight:600;color:var(--text-primary);}
+.faq-icon{color:var(--text-muted);font-size:12px;transition:transform .3s;flex-shrink:0;}
+.faq-item.open .faq-icon{transform:rotate(180deg);}
+.faq-a{display:none;padding:0 20px 18px;font-size:13px;color:var(--text-secondary);line-height:1.7;}
+.faq-item.open .faq-a{display:block;}
+/* ══════════════════════════════
+   FOOTER
+══════════════════════════════ */
+#footer{background:var(--bg-secondary);border-top:1px solid var(--border-subtle);padding-top:48px;}
+.footer-desc{color:var(--text-secondary);font-size:13px;line-height:1.7;max-width:260px;}
+.footer-heading{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--text-muted);text-transform:uppercase;}
+.footer-link{color:var(--text-secondary);font-size:13px;font-family:'Exo 2',sans-serif;transition:color .3s;}
+.footer-link:hover{color:var(--green);}
+.footer-input-group{display:flex;gap:8px;}
+.footer-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border-subtle);border-radius:4px;padding:10px 14px;color:var(--text-primary);font-family:'Rajdhani',sans-serif;font-size:13px;outline:none;transition:border-color .3s;}
+.footer-input:focus{border-color:var(--border-hover);}
+.footer-input::placeholder{color:var(--text-muted);}
+.footer-subscribe-btn{background:var(--green);color:#03050d;border:none;border-radius:4px;padding:10px 16px;font-family:'Exo 2',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .3s;white-space:nowrap;}
+.footer-subscribe-btn:hover{box-shadow:0 0 20px var(--glow-green);}
+.footer-bottom{border-top:1px solid var(--border-subtle);padding:20px 0;margin-top:32px;color:var(--text-muted);font-family:'Share Tech Mono',monospace;font-size:clamp(10px,1.2vw,12px);letter-spacing:1px;text-align:center;}
+.footer-bottom .heart{color:var(--red);}
+.footer-bottom span{color:var(--green);}
+/* ══════════════════════════════
+   RESPONSIVE — CONTACT PAGE
+══════════════════════════════ */
+
+/* ── Tablet (≤ 992px) ── */
+@media (max-width: 992px) {
+  .about-hero { padding: 100px 0 48px; min-height: 280px; }
+  .about-hero-title { font-size: clamp(22px, 5vw, 40px); }
+
+  .contact-info-card,
+  .contact-form-card { border-radius: 10px; padding: 22px; }
+
+  /* Stack contact columns naturally — Bootstrap handles col-lg-4/8 */
+}
+
+/* ── Mobile (≤ 768px) ── */
+@media (max-width: 768px) {
+  /* Hero */
+  .about-hero { padding: 90px 16px 40px; min-height: 240px; }
+  .about-hero-title { font-size: clamp(20px, 6vw, 32px); line-height: 1.2; }
+  .about-hero-sub { font-size: 13px; }
+  .page-badge { font-size: 9px; letter-spacing: 2px; padding: 4px 10px; }
+
+  /* Mission section */
+  .about-section-title { font-size: clamp(16px, 5vw, 22px); }
+  .about-text { font-size: 13px; line-height: 1.7; }
+  .section-tag { font-size: 9px; }
+
+  /* Mission cards — 2-col on mobile already via col-6, just tighten padding */
+  .mission-card { padding: 14px 12px; }
+  .mc-icon { font-size: 20px; margin-bottom: 6px; }
+  .mc-title { font-size: 9px; letter-spacing: 1px; }
+  .mc-desc { font-size: 11px; }
+
+  /* Contact info card */
+  .contact-info-card { padding: 18px 16px; margin-bottom: 0; }
+  .ci-item { padding: 12px 0; gap: 12px; }
+  .ci-icon { width: 36px; height: 36px; font-size: 14px; flex-shrink: 0; }
+  .ci-label { font-size: 10px; }
+  .ci-val { font-size: 13px; word-break: break-word; }
+
+  /* Contact form card */
+  .contact-form-card { padding: 18px 16px; }
+  .cf-title { font-size: 12px; letter-spacing: 1.5px; margin-bottom: 16px; }
+
+  /* Send button — full width on mobile */
+  .btn-send-message {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-align: center;
+  }
+
+  /* FAQ */
+  .faq-q { font-size: 13px; padding: 14px 16px; }
+  .faq-a { font-size: 12px; padding: 0 16px 14px; }
+  .faq-item { margin-bottom: 10px; }
+
+  /* Section titles */
+  .section-title { font-size: clamp(18px, 5vw, 26px) !important; }
+  .section-subtitle { font-size: 13px; }
+
+  /* Footer responsive */
+  .footer-input-group { flex-direction: column; gap: 8px; }
+  .footer-subscribe-btn { width: 100%; padding: 12px; }
+  .footer-bottom { font-size: 10px; text-align: center; line-height: 1.6; }
+}
+
+/* ── Small Mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  .about-hero { padding: 80px 12px 32px; }
+  .about-hero-title { font-size: clamp(18px, 7vw, 26px); }
+
+  /* Mission cards — stack to 1-col on very small screens */
+  .mission-card { padding: 12px 10px; }
+
+  /* Form inputs — make sure nothing overflows */
+  .form-input { font-size: 13px; padding: 12px 12px 12px 40px; }
+
+  /* Contact info values — break long emails */
+  .ci-val { font-size: 12px; }
+
+  /* FAQ */
+  .faq-q { font-size: 12px; gap: 8px; }
+
+  /* Section padding tighter */
+  .py-5.bg-main .container.py-4,
+  .container.py-4 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+}
+
+/* ── Landscape phones (≤ 640px height) ── */
+@media (max-height: 640px) and (orientation: landscape) {
+  .about-hero { min-height: 200px; padding: 80px 16px 28px; }
+}
+
+/* Prevent horizontal scroll on all devices */
+body { overflow-x: hidden; }
+.about-hero, section { overflow-x: hidden; }

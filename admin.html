@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IdentityShield — Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+ <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+       <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin.css') }}">
+  <style>
+    /* Fix: account for fixed navbar (ticker 36px + nav 70px = 106px) */
+    .admin-container {
+      margin-top: 106px !important;
+    }
+  </style>
+</head>
+<body>
+
+<!-- TICKER BAR -->
+<div id="ticker-bar">
+  <div class="ticker-live">LIVE</div>
+  <div class="ticker-wrapper">
+    <div class="ticker-content">
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Adobe Breach: 153M records exposed</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>LinkedIn: 700M accounts on dark web</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Yahoo Breach: 3 Billion accounts affected</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>Security patch released for critical CVE-2025-0342</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="main-nav">
+  <div class="d-flex align-items-center gap-3">
+    <a href="/" class="d-flex align-items-center gap-3 text-decoration-none">
+      <div class="nav-logo"><svg viewBox="0 0 40 44" fill="none" class="shield-pulse"><path d="M20 2L4 9V22C4 31.4 11 40.1 20 42C29 40.1 36 31.4 36 22V9L20 2Z" fill="rgba(0,255,136,0.12)" stroke="#00ff88" stroke-width="1.5"/><path d="M16 21L19 24L25 18" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="brand-text">IDENTITY<span>SHIELD</span></div>
+    </a>
+    <div class="admin-badge-nav">ADMIN</div>
+  </div>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/scanner">Scan</a>
+    <a href="/awareness">Awareness</a>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:6px 14px;">
+      <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#ff4757,#c84b31);display:flex;align-items:center;justify-content:center;font-family:Orbitron,monospace;font-weight:700;font-size:13px;color:#fff;">A</div>
+      <span style="font-family:'Exo 2',sans-serif;font-size:13px;font-weight:600;color:#dde6f0;">Admin</span>
+    </div>
+    <a href="/" style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);color:#00d4ff;border-radius:8px;padding:7px 13px;font-size:12px;text-decoration:none;font-family:'Exo 2',sans-serif;" title="Back to Site"><i class="fas fa-home"></i></a>
+    <a href="#" onclick="logoutUser()" style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);color:#ff4757;border-radius:8px;padding:7px 13px;font-size:12px;text-decoration:none;font-family:'Exo 2',sans-serif;" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+    <button class="hamburger" id="mobileToggle" onclick="toggleMobileSidebar()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- MAIN ADMIN CONTAINER -->
+<div class="admin-container">
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="admin-sidebar-logo">
+      <div class="admin-logo-icon">🛡️</div>
+      <div class="admin-logo-text">ADMIN<span>PANEL</span></div>
+    </div>
+    <nav class="admin-nav">
+      <a href="#" class="admin-nav-link active" onclick="showAdminTab('dashboard',this)"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+      <a href="#" class="admin-nav-link" onclick="showAdminTab('users',this)"><i class="fas fa-users"></i><span>Users</span></a>
+      <a href="#" class="admin-nav-link" onclick="showAdminTab('scans',this)"><i class="fas fa-search"></i><span>Scans</span></a>
+      <a href="#" class="admin-nav-link" onclick="showAdminTab('reports',this)"><i class="fas fa-file-alt"></i><span>Reports</span></a>
+      <a href="#" class="admin-nav-link" onclick="showAdminTab('messages',this)"><i class="fas fa-envelope"></i><span>Messages</span></a>
+      <a href="#" class="admin-nav-link" onclick="showAdminTab('support',this)"><i class="fas fa-headset"></i><span>Support Tickets</span></a>
+     <!-- <a href="#" class="admin-nav-link" onclick="showAdminTab('awareness',this)"><i class="fas fa-newspaper"></i><span>Articles</span></a> -->
+      <div class="admin-nav-divider"></div>
+     <!--href="#" class="admin-nav-link" onclick="showAdminTab('system',this)"><i class="fas fa-cogs"></i><span>System</span></a> -->
+      <a href="/" class="admin-nav-link"><i class="fas fa-home"></i><span>Back</span></a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="admin-main" id="admin-main-content">
+
+    <!-- DASHBOARD TAB -->
+    <div class="admin-tab" id="admin-tab-dashboard">
+      <div class="admin-page-header">
+        <div><div class="admin-page-title">Dashboard</div><div class="admin-page-sub">System overview</div></div>
+        <div class="admin-header-time" id="admin-time"></div>
+      </div>
+
+      <!-- STAT CARDS -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3"><div class="admin-stat-card asc-blue reveal"><div class="asc-icon"><i class="fas fa-users"></i></div><div class="asc-num">{{ stats.total_users }}</div><div class="asc-label">Total Users</div></div></div>
+        <div class="col-6 col-lg-3"><div class="admin-stat-card asc-green reveal"><div class="asc-icon"><i class="fas fa-search"></i></div><div class="asc-num">{{ stats.total_scans }}</div><div class="asc-label">Total Scans</div></div></div>
+        <div class="col-6 col-lg-3"><div class="admin-stat-card asc-red reveal"><div class="asc-icon"><i class="fas fa-exclamation-triangle"></i></div><div class="asc-num">{{ stats.high_risk }}</div><div class="asc-label">High / Critical Risk</div></div></div>
+        <div class="col-6 col-lg-3"><div class="admin-stat-card asc-violet reveal"><div class="asc-icon"><i class="fas fa-envelope"></i></div><div class="asc-num">{{ stats.unread_msgs }}</div><div class="asc-label">Unread Messages</div>{% if stats.open_tickets > 0 %}<div class="asc-growth red-text">{{ stats.open_tickets }} open tickets</div>{% endif %}</div></div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-8 d-flex">
+          <div class="admin-chart-card w-100">
+            <div class="chart-card-header"><div class="chart-card-title"><i class="fas fa-chart-line me-2"></i>Daily Scans</div><div class="chart-card-badge">Live</div></div>
+            <canvas id="chart-daily-scans" height="150"> </canvas>
+          </div>
+        </div>
+        <div class="col-lg-4 d-flex">
+          <div class="admin-chart-card w-100">
+            <div class="chart-card-header"><div class="chart-card-title"><i class="fas fa-chart-pie me-2"></i>Risk Distribution</div></div>
+            <canvas id="chart-risk-pie" height="150"></canvas>
+            <div class="pie-legend" id="pie-legend"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY & API HEALTH -->
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="admin-chart-card">
+            <div class="chart-card-header"><div class="chart-card-title"><i class="fas fa-chart-bar me-2"></i>Top Platforms</div></div>
+            <canvas id="chart-platforms" height="120"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="admin-chart-card">
+            <div class="chart-card-header"><div class="chart-card-title"><i class="fas fa-bolt me-2"></i>Activity Feed</div><div class="activity-live-dot"></div></div>
+            <div class="activity-feed" id="activity-feed">
+              <div class="activity-item"><span class="act-time">Now</span><span class="act-text scan-act">Email scan performed</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div class="admin-tab" id="admin-tab-users" style="display:none;">
+      <div class="admin-page-header">
+        <div><div class="admin-page-title">User Management</div><div class="admin-page-sub">Manage users</div></div>
+        <div class="admin-search-wrap"><i class="fas fa-search admin-search-icon"></i><input type="text" class="admin-search" placeholder="Search..." id="user-search" oninput="filterUsers()"/></div>
+      </div>
+	  <!-- ADD THIS CHART CARD -->
+  <div class="admin-chart-card mb-4">
+    <div class="chart-card-header">
+      <div class="chart-card-title"><i class="fas fa-users me-2"></i>Monthly User Registrations</div>
+    </div>
+    <div style="height:150px;position:relative;">
+      <canvas id="chart-monthly-users-tab"></canvas>
+    </div>
+  </div>
+
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-table" id="users-table">
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Scans</th><th>Risk</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="users-tbody">
+              {% for u in users %}
+              <tr>
+                <td><span class="uid">#{{ '%03d'|format(u.id) }}</span></td>
+                <td><div class="user-cell"><div class="user-mini-avatar">{{ u.username[0]|upper }}</div>{{ u.username }}</div></td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.scan_count }}</td>
+                <td>
+                  {% if u.is_admin %}<span class="status-chip active-chip">ADMIN</span>
+                  {% elif u.max_risk in ['HIGH','CRITICAL'] %}<span class="risk-chip high-chip">{{ u.max_risk }}</span>
+                  {% elif u.max_risk == 'MEDIUM' %}<span class="risk-chip medium-chip">{{ u.max_risk }}</span>
+                  {% else %}<span class="risk-chip low-chip">{{ u.max_risk or 'N/A' }}</span>{% endif %}
+                </td>
+                <td><span class="status-chip active-chip">Active</span></td>
+                <td>{{ u.created_at[:10] if u.created_at else '-' }}</td>
+                <td class="action-btns">
+                  {% if not u.is_admin %}
+                  <button class="abt del-btn" data-id="{{ u.id }}" onclick="deleteUser(this)"><i class="fas fa-trash"></i></button>
+                  {% endif %}
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="8" style="text-align:center;color:#8a9ab0;padding:24px;">No users found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCANS TAB -->
+    <div class="admin-tab" id="admin-tab-scans" style="display:none;">
+      <div class="admin-page-header">
+        <div><div class="admin-page-title">Scan Management</div><div class="admin-page-sub">All scans</div></div>
+      </div>
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead><tr><th>Scan ID</th><th>Email</th><th>Date</th><th>Breaches</th><th>Risk</th><th>Result</th></tr></thead>
+            <tbody>
+              {% for s in scans %}
+              <tr>
+                <td><span class="uid">#S{{ '%03d'|format(s.id) }}</span></td>
+                <td>{{ s.scanned_email }}</td>
+                <td>{{ s.scan_date[:10] if s.scan_date else '-' }}</td>
+                <td>{{ s.breach_count }}</td>
+                <td><span class="risk-chip {{ 'critical-chip' if s.risk_level=='CRITICAL' else 'high-chip' if s.risk_level=='HIGH' else 'medium-chip' if s.risk_level=='MEDIUM' else 'low-chip' }}">{{ s.risk_score }}/100</span></td>
+                <td>{% if s.breach_count > 0 %}<span class="status-chip danger-chip">BREACHED</span>{% else %}<span class="status-chip active-chip">SAFE</span>{% endif %}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="6" style="text-align:center;color:#8a9ab0;padding:24px;">No scans yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS TAB -->
+    <div class="admin-tab" id="admin-tab-reports" style="display:none;">
+      <div class="admin-page-header"><div><div class="admin-page-title">Reports</div><div class="admin-page-sub">Breach events</div></div></div>
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead><tr><th>Breach Name</th><th>Times Detected</th><th>Latest Date</th><th>Severity</th></tr></thead>
+            <tbody>
+              {% for r in breach_reports_agg %}
+              <tr>
+                <td><strong>{{ r.breach_name }}</strong></td>
+                <td>{{ r.affected_count }}</td>
+                <td>{{ r.latest_date or 'Unknown' }}</td>
+                <td><span class="risk-chip {{ 'critical-chip' if r.affected_count >= 10 else 'high-chip' if r.affected_count >= 5 else 'medium-chip' }}">{{ 'CRITICAL' if r.affected_count >= 10 else 'HIGH' if r.affected_count >= 5 else 'MEDIUM' }}</span></td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" style="text-align:center;color:#8a9ab0;padding:24px;">No breach reports yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES TAB -->
+    <div class="admin-tab" id="admin-tab-messages" style="display:none;">
+      <div class="admin-page-header"><div><div class="admin-page-title">Messages</div><div class="admin-page-sub">Support requests</div></div></div>
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Subject</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="messages-tbody">
+              {% for m in messages %}
+              <tr data-msg-id="{{ m.id }}"
+                  data-msg-name="{{ m.full_name|e }}"
+                  data-msg-email="{{ m.email|e }}"
+                  data-msg-subject="{{ m.subject|e }}"
+                  data-msg-message="{{ m.message|e }}"
+                  data-msg-date="{{ m.sent_at[:16] if m.sent_at else '-' }}"
+                  data-msg-status="{{ m.status }}">
+                <td>{{ m.full_name }}</td>
+                <td>{{ m.email }}</td>
+                <td>{{ m.subject }}</td>
+                <td>{{ m.sent_at[:10] if m.sent_at else '-' }}</td>
+                <td>{% if m.status == 'unread' %}<span class="status-chip danger-chip">UNREAD</span>{% else %}<span class="status-chip active-chip">READ</span>{% endif %}</td>
+                <td class="action-btns"><button class="abt view-btn" onclick="viewMessage({{ m.id }}, this)"><i class="fas fa-eye"></i></button></td>
+              </tr>
+              {% else %}
+              <tr><td colspan="6" style="text-align:center;color:#8a9ab0;padding:24px;">No messages yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPPORT TICKETS TAB -->
+    <div class="admin-tab" id="admin-tab-support" style="display:none;">
+      <div class="admin-page-header">
+        <div><div class="admin-page-title">Support Tickets</div><div class="admin-page-sub">User queries and replies</div></div>
+      </div>
+      <div class="admin-table-card">
+        <div id="admin-tickets-list">
+          <div style="padding:32px;text-align:center;color:#8a9ab0;"><i class="fas fa-headset" style="font-size:28px;margin-bottom:10px;display:block;color:#00d4ff;"></i>Click "Support Tickets" in the sidebar to load tickets.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARTICLES TAB 
+    <div class="admin-tab" id="admin-tab-awareness" style="display:none;">
+      <div class="admin-page-header">
+        <div><div class="admin-page-title">Articles</div><div class="admin-page-sub">Manage content</div></div>
+        <button class="btn-add-article" onclick="showAddArticle()"><i class="fas fa-plus me-2"></i>Add</button>
+      </div>
+      <div id="add-article-form" class="add-article-card" style="display:none;">
+        <div class="aa-title">Add Article</div>
+        <div class="row g-3">
+          <div class="col-md-6"><input type="text" class="admin-form-input" placeholder="Title" id="article-title"/></div>
+          <div class="col-md-6"><input type="text" class="admin-form-input" placeholder="Category" id="article-category"/></div>
+          <div class="col-12"><textarea class="admin-form-input" rows="3" placeholder="Content..." id="article-content"></textarea></div>
+          <div class="col-12 d-flex gap-2">
+            <button class="btn-save-article" onclick="saveArticle()"><i class="fas fa-save me-1"></i>Save</button>
+            <button class="btn-cancel-article" onclick="hideAddArticle()">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div class="admin-table-card">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="articles-tbody">
+              <tr><td>Security Tips</td><td><span class="platform-tag">Security</span></td><td>Jun 1</td><td><span class="status-chip active-chip">Published</span></td><td class="action-btns"><button class="abt edit-btn"><i class="fas fa-edit"></i></button><button class="abt del-btn"><i class="fas fa-trash"></i></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+	-->
+
+    <!-- SYSTEM TAB 
+    <div class="admin-tab" id="admin-tab-system" style="display:none;">
+      <div class="admin-page-header"><div><div class="admin-page-title">System</div><div class="admin-page-sub">Statistics</div></div></div>
+      <div class="row g-4">
+        <div class="col-lg-6"><div class="admin-chart-card"><div class="chart-card-header"><div class="chart-card-title">Monthly Users</div></div><canvas id="chart-monthly-users" height="120"></canvas></div></div>
+        <div class="col-lg-6"><div class="admin-chart-card"><div class="chart-card-header"><div class="chart-card-title">Platform Usage</div></div><canvas id="chart-platform-usage" height="120"></canvas></div></div>
+      </div>
+    </div>
+
+  </main>
+</div> -->
+
+<!-- FOOTER -->
+<!-- <footer id="footer">
+  <div class="container-fluid">
+    <div class="row g-4 mb-4">
+      <div class="col-md-3 col-12">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <div style="font-size:24px;">🛡️</div>
+          <span style="font-family:'Orbitron',monospace;font-weight:800;">IDENTITY<span style="color:#00ff88;">SHIELD</span></span>
+        </div>
+        <p class="footer-desc">Protecting digital identities with real-time breach detection.</p>
+      </div>
+      <div class="col-md-2 col-6">
+        <div class="footer-heading">PLATFORM</div>
+        <a href="/" class="footer-link">Home</a><br>
+        <a href="/scanner" class="footer-link">Scan</a><br>
+        <a href="/awareness" class="footer-link">Awareness</a>
+      </div>
+      <div class="col-md-2 col-6">
+        <div class="footer-heading">COMPANY</div>
+        <a href="#" class="footer-link">About</a><br>
+        <a href="/contact" class="footer-link">Contact</a><br>
+        <a href="#" class="footer-link">Privacy</a>
+      </div>
+      <div class="col-md-4 col-12">
+        <div class="footer-heading">SUBSCRIBE</div>
+        <p class="footer-desc">Get security alerts.</p>
+        <div class="footer-input-group">
+          <input type="email" class="footer-input" placeholder="your@email.com"/>
+          <button class="footer-subscribe-btn">Subscribe</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 <span style="color:#00ff88;">IdentityShield</span> — All Rights Reserved</p>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-notification" class="toast-notify"><div class="toast-icon" id="toast-icon">✓</div><div class="toast-msg" id="toast-msg"></div></div> -->
+
+<script>
+  window.ADMIN_DATA = {
+    topPlatforms: {{ top_platforms | tojson }},
+    monthlyUsers: {{ monthly_users | tojson }}
+  }
+</script>
+<!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+
+<div id="toast-notification" class="toast-notify"><div class="toast-icon" id="toast-icon">✓</div><div class="toast-msg" id="toast-msg"></div></div>
+
+<!-- Message view modal -->
+<div id="msg-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(2,8,19,0.88);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:#0a0f1e;border:1px solid rgba(0,212,255,0.25);border-radius:16px;padding:32px;width:100%;max-width:520px;margin:20px;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-family:Orbitron,monospace;font-size:14px;color:#00d4ff;letter-spacing:2px;"><i class="fas fa-envelope me-2"></i>CONTACT MESSAGE</div>
+      <button onclick="closeMsgModal()" style="background:none;border:none;color:#8a9ab0;font-size:18px;cursor:pointer;"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="msg-modal-body" style="color:#dde6f0;font-size:14px;line-height:1.8;"></div>
+
+	 <!-- REPLY SECTION -->
+    <div style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;">
+      <label style="font-size:11px;color:#8a9ab0;font-family:Share Tech Mono,monospace;letter-spacing:1px;display:block;margin-bottom:8px;">YOUR REPLY</label>
+      <textarea id="msg-reply-input" rows="4" placeholder="Type your reply here..."
+        style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;color:#dde6f0;font-size:13px;outline:none;resize:vertical;font-family:'Exo 2',sans-serif;"></textarea>
+      <div id="msg-reply-error" style="display:none;color:#ff4757;font-size:12px;margin-top:6px;"></div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button onclick="closeMsgModal()" style="flex:1;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#8a9ab0;cursor:pointer;font-family:'Exo 2',sans-serif;">Cancel</button>
+        <button id="send-msg-reply-btn" onclick="sendMsgReply()" style="flex:2;padding:10px;background:rgba(0,212,255,0.12);border:1px solid #00d4ff;border-radius:8px;color:#00d4ff;font-family:Orbitron,monospace;font-size:11px;letter-spacing:1px;cursor:pointer;"><i class="fas fa-paper-plane me-1"></i> Send Reply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Support ticket reply modal -->
+<div id="ticket-reply-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(2,8,19,0.88);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:#0a0f1e;border:1px solid rgba(0,212,255,0.25);border-radius:16px;padding:32px;width:100%;max-width:540px;margin:20px;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-family:Orbitron,monospace;font-size:14px;color:#00d4ff;letter-spacing:2px;"><i class="fas fa-headset me-2"></i>SUPPORT TICKET</div>
+      <button onclick="closeTicketModal()" style="background:none;border:none;color:#8a9ab0;font-size:18px;cursor:pointer;"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="ticket-modal-body" style="color:#dde6f0;font-size:14px;line-height:1.8;margin-bottom:20px;"></div>
+    <div id="ticket-reply-section">
+      <label style="font-size:11px;color:#8a9ab0;font-family:Share Tech Mono,monospace;letter-spacing:1px;display:block;margin-bottom:8px;">YOUR REPLY</label>
+      <textarea id="ticket-reply-input" rows="4" placeholder="Type your reply here..."
+        style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 14px;color:#dde6f0;font-size:13px;outline:none;resize:vertical;font-family:Exo 2,sans-serif;"></textarea>
+      <div id="ticket-reply-error" style="display:none;color:#ff4757;font-size:12px;margin-top:6px;"></div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button onclick="closeTicketModal()" style="flex:1;padding:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#8a9ab0;cursor:pointer;font-family:Exo 2,sans-serif;">Cancel</button>
+        <button id="send-reply-btn" onclick="sendTicketReply()" style="flex:2;padding:10px;background:rgba(0,212,255,0.12);border:1px solid #00d4ff;border-radius:8px;color:#00d4ff;font-family:Orbitron,monospace;font-size:11px;letter-spacing:1px;cursor:pointer;"><i class="fas fa-paper-plane me-1"></i> Send Reply</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IdentityShield — Protect Your Digital Identity</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- GRID OVERLAY -->
+<div class="grid-overlay"></div>
+
+<!-- SCAN BLOCKED OVERLAY (shown when not logged in, user tries to access scan) -->
+<div id="blocked-overlay">
+  <div class="blocked-card">
+    <div class="blocked-icon">🔒</div>
+    <div class="blocked-title">LOGIN REQUIRED</div>
+    <div class="blocked-sub">You must be logged in to scan for breaches</div>
+    <button class="btn-blocked-login" onclick="openModal()">Login Now</button>
+  </div>
+</div>
+
+<!-- TICKER BAR -->
+<div id="ticker-bar">
+  <div class="ticker-live">LIVE</div>
+  <div class="ticker-wrapper">
+    <div class="ticker-content">
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Adobe Breach: 153M records exposed</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>LinkedIn: 700M accounts on dark web</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Yahoo Breach: 3 Billion accounts affected</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>Security patch released for critical CVE-2025-0342</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Equifax: 147M Social Security numbers leaked</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>New ransomware variant targeting healthcare systems</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>CISA issues emergency directive for zero-day vulnerability</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Facebook: 533M phone numbers exposed in 2024 dump</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>Phishing campaigns up 340% in Q1 2025</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>MFA now mandatory for federal agencies</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Adobe Breach: 153M records exposed</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>LinkedIn: 700M accounts on dark web</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Yahoo Breach: 3 Billion accounts affected</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>Security patch released for critical CVE-2025-0342</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Equifax: 147M Social Security numbers leaked</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="main-nav">
+  <div class="d-flex align-items-center gap-3">
+    <div class="nav-logo">
+      <svg viewBox="0 0 40 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="shield-pulse">
+        <path d="M20 2L4 9V22C4 31.4 11 40.1 20 42C29 40.1 36 31.4 36 22V9L20 2Z" fill="rgba(0,255,136,0.12)" stroke="#00ff88" stroke-width="1.5"/>
+        <path d="M20 8L10 13V22C10 27.8 14.5 33.2 20 34.8C25.5 33.2 30 27.8 30 22V13L20 8Z" fill="rgba(0,255,136,0.08)" stroke="#00ff88" stroke-width="1" opacity="0.6"/>
+        <path d="M16 21L19 24L25 18" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="brand-text">IDENTITY<span>SHIELD</span></div>
+  </div>
+
+  <div class="nav-links">
+    <a href="/" class="active">Home</a>
+    <a href="/scanner" onclick="requireLogin(event, '/scanner')">Scan</a>
+    <a href="/awareness">Awareness</a>
+    <a href="/contact">Contact</a>
+  </div>
+
+  <div class="d-flex align-items-center gap-2">
+    <!-- LOGGED OUT: show Login button -->
+    <div id="nav-login-area">
+      <button class="btn-login px-3 py-2" onclick="openModal()">
+        <i class="fas fa-lock me-1"></i> Login
+      </button>
+    </div>
+    <!-- LOGGED IN: show profile dropdown (hidden by default) -->
+    <div id="nav-profile-area" style="display:none; position:relative;">
+      <button class="btn-profile" onclick="toggleProfileDropdown()">
+        <div class="profile-avatar" id="nav-avatar">K</div>
+        <span id="nav-username">Kiran</span>
+        <i class="fas fa-chevron-down ms-1" style="font-size:10px;"></i>
+      </button>
+      <div class="profile-dropdown" id="profile-dropdown">
+        <div class="profile-dropdown-header">
+          <div class="profile-dropdown-avatar" id="dropdown-avatar">K</div>
+          <div>
+            <div class="profile-dropdown-name" id="dropdown-name">Kiran</div>
+            <div class="profile-dropdown-email" id="dropdown-email">kiran@email.com</div>
+          </div>
+        </div>
+        <div class="profile-dropdown-divider"></div>
+        <a href="/dashboard" onclick="requireLogin(event,'/dashboard')" class="profile-dropdown-item">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+        <a href="/scanner" onclick="requireLogin(event,'/scanner')" class="profile-dropdown-item">
+          <i class="fas fa-search"></i> Scan Email
+        </a>
+        <div class="profile-dropdown-divider"></div>
+        <a href="#" onclick="logoutUser()" class="profile-dropdown-item text-danger-item">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+
+    <button class="hamburger" onclick="toggleMobile()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mobile-menu">
+  <button class="menu-close" onclick="toggleMobile()"><i class="fas fa-times"></i></button>
+  <a href="/" onclick="toggleMobile()">Home</a>
+  <a href="/scanner" onclick="requireLogin(event,'/scanner');toggleMobile();">Scan</a>
+  <a href="/awareness" onclick="toggleMobile()">Awareness</a>
+  <a href="/contact" onclick="toggleMobile()">Contact</a>
+  <button class="btn-login px-4 py-2 mt-3" onclick="openModal();toggleMobile();">Login / Register</button>
+</div>
+
+<!-- LOGIN / REGISTER MODAL -->
+<div id="login-modal">
+  <div class="modal-card">
+    <button class="modal-close" id="modal-close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+
+    <!-- Shield Icon -->
+    <div class="d-flex justify-content-center mb-3">
+      <svg width="52" height="58" viewBox="0 0 40 44" fill="none" class="shield-pulse">
+        <path d="M20 2L4 9V22C4 31.4 11 40.1 20 42C29 40.1 36 31.4 36 22V9L20 2Z" fill="rgba(0,255,136,0.15)" stroke="#00ff88" stroke-width="1.5"/>
+        <path d="M16 21L19 24L25 18" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Tabs -->
+    <div class="modal-tabs mb-4">
+      <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">LOGIN</button>
+      <button class="modal-tab" id="tab-register" onclick="switchTab('register')">REGISTER</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div class="modal-title text-center mb-1">Welcome Back</div>
+      <div class="modal-subtitle text-center mb-4">Secure your digital identity today</div>
+
+      <div class="input-group-custom mb-3">
+        <div class="input-box">
+          <i class="fas fa-envelope input-icon"></i>
+          <input class="form-input" id="login-email" type="email" placeholder="Email Address" autocomplete="email"/>
+        </div>
+        <div class="input-error" id="err-login-email"></div>
+      </div>
+      <div class="input-group-custom mb-2">
+        <div class="input-box">
+          <i class="fas fa-lock input-icon"></i>
+          <input class="form-input" id="login-password" type="password" placeholder="Password" autocomplete="current-password"/>
+          <button class="toggle-password" onclick="togglePass('login-password', this)"><i class="fas fa-eye"></i></button>
+        </div>
+        <div class="input-error" id="err-login-password"></div>
+      </div>
+	   <div class="d-flex align-items-center mb-3">
+		<input type="checkbox" id="remember-me" style="margin-right:8px;"/>
+		<label for="remember-me" class="modal-link" style="font-size:12px;">Remember me</label>
+	  </div>
+      <div class="d-flex justify-content-end mb-3">
+        <a href="/repass" class="modal-link" style="font-size:11px;">Forgot Password?</a>
+      </div>
+      <div class="form-error-banner" id="login-error-banner"></div>
+      <button class="btn-modal-login py-3" onclick="submitLogin()">
+        <span id="login-btn-text"><i class="fas fa-shield-alt me-2"></i>LOGIN SECURELY</span>
+        <span id="login-btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin me-2"></i>Verifying...</span>
+      </button>
+      <div class="modal-footer-text mt-3 text-center">
+        Don't have an account? <a href="/register" class="modal-link" onclick="switchTab('/register')">Register Free</a>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="form-register" style="display:none;">
+      <div class="modal-title text-center mb-1">Create Account</div>
+      <div class="modal-subtitle text-center mb-4">Join thousands of protected users</div>
+
+      <div class="input-group-custom mb-3">
+        <div class="input-box">
+          <i class="fas fa-user input-icon"></i>
+          <input class="form-input" id="reg-username" type="text" placeholder="Full Name" autocomplete="name"/>
+        </div>
+        <div class="input-error" id="err-reg-username"></div>
+      </div>
+      <div class="input-group-custom mb-3">
+        <div class="input-box">
+          <i class="fas fa-envelope input-icon"></i>
+          <input class="form-input" id="reg-email" type="email" placeholder="Email Address" autocomplete="email"/>
+        </div>
+        <div class="input-error" id="err-reg-email"></div>
+      </div>
+      <div class="input-group-custom mb-3">
+        <div class="input-box">
+          <i class="fas fa-lock input-icon"></i>
+          <input class="form-input" id="reg-password" type="password" placeholder="Password (min 6 chars)"/>
+          <button class="toggle-password" onclick="togglePass('reg-password', this)"><i class="fas fa-eye"></i></button>
+        </div>
+        <div class="input-error" id="err-reg-password"></div>
+        <div class="password-strength mt-1" id="pwd-strength-bar">
+          <div class="pwd-bar" id="pwd-bar"></div>
+        </div>
+        <div class="pwd-strength-label" id="pwd-strength-label"></div>
+      </div>
+      <div class="input-group-custom mb-3">
+        <div class="input-box">
+          <i class="fas fa-lock input-icon"></i>
+          <input class="form-input" id="reg-confirm" type="password" placeholder="Confirm Password"/>
+        </div>
+        <div class="input-error" id="err-reg-confirm"></div>
+      </div>
+      <div class="form-error-banner" id="reg-error-banner"></div>
+      <button class="btn-modal-login py-3" onclick="submitRegister()">
+        <span id="reg-btn-text"><i class="fas fa-user-plus me-2"></i>CREATE ACCOUNT</span>
+        <span id="reg-btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin me-2"></i>Creating...</span>
+      </button>
+      <div class="modal-footer-text mt-3 text-center">
+        Already have an account? <a href="/login" class="modal-link" onclick="switchTab('/login')">Login</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CAROUSEL -->
+<section id="carousel">
+  <div class="carousel-bg"></div>
+  <div class="carousel-slide slide-emerald active">
+    <div class="slide-visual"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="slide-emoji">🛡️</div></div>
+    <div class="slide-tag">🛡️ &nbsp;DIGITAL IDENTITY PROTECTION</div>
+    <h2>Guard Your Digital<br>Identity 24/7</h2>
+    <p>Real-time breach detection powered by 10B+ records</p>
+    <button class="btn-slide" onclick="requireLogin(event,'/scanner')">Start Free Scan</button>
+  </div>
+  <div class="carousel-slide slide-cyan">
+    <div class="slide-visual"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="slide-emoji">📧</div></div>
+    <div class="slide-tag">🔍 &nbsp;DATA BREACH DETECTION</div>
+    <h2>Your Email May Be in<br>500+ Breach Databases</h2>
+    <p>Hackers are selling your data on the dark web right now</p>
+    <button class="btn-slide" onclick="requireLogin(event,'/scanner')">Scan My Email Free</button>
+  </div>
+  <div class="carousel-slide slide-red">
+    <div class="slide-visual"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="slide-emoji">🔴</div></div>
+    <div class="slide-tag">⚠️ &nbsp;GLOBAL CYBER ALERT</div>
+    <h2>Every 39 Seconds,<br>A Hacker Attacks</h2>
+    <p>10 billion records stolen in 2024 alone</p>
+    <button class="btn-slide" onclick="requireLogin(event,'/scanner')">Am I Affected?</button>
+  </div>
+  <div class="carousel-slide slide-purple">
+    <div class="slide-visual"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="slide-emoji">📊</div></div>
+    <div class="slide-tag">📊 &nbsp;YOUR SECURITY DASHBOARD</div>
+    <h2>Monitor. Detect.<br>Protect. Repeat.</h2>
+    <p>Your personal cybersecurity command center</p>
+    <button class="btn-slide" onclick="requireLogin(event,'/dashboard')">View Dashboard</button>
+  </div>
+  <div class="carousel-slide slide-violet">
+    <div class="slide-visual"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="slide-emoji">⚡</div></div>
+    <div class="slide-tag">👥 &nbsp;TRUSTED BY THOUSANDS</div>
+    <h2>Join 10,000+ Already<br>Protected Users</h2>
+    <p>Students, professionals, businesses — all protected</p>
+    <button class="btn-slide" onclick="openModal()">Join Free Now</button>
+  </div>
+  <div class="carousel-controls">
+    <button class="carousel-arrow" id="prev-btn"><i class="fas fa-chevron-left"></i></button>
+    <div class="progress-bars">
+      <div class="prog-bar active"><div class="prog-bar-fill"></div></div>
+      <div class="prog-bar"><div class="prog-bar-fill"></div></div>
+      <div class="prog-bar"><div class="prog-bar-fill"></div></div>
+      <div class="prog-bar"><div class="prog-bar-fill"></div></div>
+      <div class="prog-bar"><div class="prog-bar-fill"></div></div>
+    </div>
+    <div class="slide-counter">01 / 05</div>
+    <button class="carousel-arrow" id="next-btn"><i class="fas fa-chevron-right"></i></button>
+  </div>
+</section>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="particles-canvas"></canvas>
+  <div class="container position-relative" style="z-index:2;">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 reveal">
+        <div class="hero-tag mb-4">DIGITAL IDENTITY PROTECTION PLATFORM</div>
+        <h1 class="hero-heading mb-3">
+          <span class="line-static">CHECK YOUR</span>
+          <span class="line-type" id="type-text">&nbsp;<span class="cursor-blink"></span></span>
+          <span class="line-static">BREACH STATUS</span>
+        </h1>
+        <p class="hero-desc mb-4">IdentityShield scans billions of compromised records to tell you exactly where your personal data has been exposed — and what to do about it.</p>
+        <div class="d-flex flex-wrap gap-3 mb-4">
+          <button class="btn-primary-glow" onclick="requireLogin(event,'/scanner')">🔍 Scan My Email Free</button>
+          <button class="btn-outline-hero" onclick="scrollToSection('how')">How It Works →</button>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><span class="stat-num">10B+</span><span class="stat-label">Records</span></div>
+          <div class="hero-stat"><span class="stat-num">500+</span><span class="stat-label">Breaches</span></div>
+          <div class="hero-stat"><span class="stat-num">Live</span><span class="stat-label">API</span></div>
+          <div class="hero-stat"><span class="stat-num">Free</span><span class="stat-label">Always</span></div>
+        </div>
+      </div>
+      <div class="col-lg-6 reveal reveal-delay-2">
+        <div class="shield-container">
+          <div class="shield-glow"></div>
+          <div class="orbit-ring"><div class="orbit-dot"></div></div>
+          <div class="orbit-ring"></div>
+          <div class="orbit-ring"></div>
+          <div class="shield-3d" id="shield-3d">
+            <svg viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M60 4L8 26V66C8 96.4 30 124 60 132C90 124 112 96.4 112 66V26L60 4Z" fill="rgba(0,255,136,0.07)" stroke="#00ff88" stroke-width="2"/>
+              <path d="M60 16L20 34V66C20 89.6 37.6 110.2 60 117C82.4 110.2 100 89.6 100 66V34L60 16Z" fill="rgba(0,255,136,0.05)" stroke="rgba(0,255,136,0.4)" stroke-width="1"/>
+              <path d="M60 28L32 42V66C32 83.2 44.8 98.4 60 103C75.2 98.4 88 83.2 88 66V42L60 28Z" fill="rgba(0,255,136,0.04)" stroke="rgba(0,255,136,0.25)" stroke-width="1"/>
+              <path d="M46 66L55 76L78 54" stroke="#00ff88" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="60" cy="66" r="8" fill="rgba(0,255,136,0.1)" stroke="rgba(0,255,136,0.3)" stroke-width="1"/>
+            </svg>
+          </div>
+          <!-- Floating threat badges -->
+          <!-- <div class="float-badge badge-top-right reveal">
+            <span class="badge-dot red"></span>
+            <span class="badge-text">3 Breaches Detect</span>
+          </div>
+          <div class="float-badge badge-bottom-left reveal reveal-delay-2">
+            <span class="badge-dot green"></span>
+            <span class="badge-text">Scan Complete</span>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div id="stats-bar">
+  <div class="container-fluid px-0">
+    <div class="d-flex flex-wrap">
+      <div class="stat-col reveal">
+        <span class="stat-big red" data-target="10000000000" data-suffix="B+" data-divisor="1000000000">0B+</span>
+        <span class="stat-desc">Records in Breach Databases</span>
+      </div>
+      <div class="stat-col reveal reveal-delay-1">
+        <span class="stat-big green" data-target="587" data-suffix="+">0+</span>
+        <span class="stat-desc">Known Data Breaches</span>
+      </div>
+      <div class="stat-col reveal reveal-delay-2">
+        <span class="stat-big cyan" data-target="39">0</span>
+        <span class="stat-desc">Seconds Between Attacks</span>
+      </div>
+      <div class="stat-col reveal reveal-delay-3">
+        <span class="stat-big violet" data-target="100" data-suffix="%">0%</span>
+        <span class="stat-desc">Free to Use</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="py-5">
+  <div class="container py-4 py-lg-5">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 reveal">
+        <div class="section-tag mb-4">ABOUT IDENTITYSHIELD</div>
+        <div class="big-quote mb-4">"Your personal cybersecurity guardian — scanning, detecting, and protecting your digital identity 24/7"</div>
+        <p class="about-text mb-3">IdentityShield cross-references your personal data against the world's largest collection of breach databases, giving you a clear picture of your exposure and actionable steps to secure your accounts.</p>
+        <p class="about-text mb-4">From real-time breach alerts to smart risk scoring, we make enterprise-grade security accessible to everyone — students, freelancers, and professionals alike.</p>
+        <button class="btn-learn" onclick="scrollToSection('features')">Explore Features →</button>
+      </div>
+      <div class="col-lg-6 reveal reveal-delay-2">
+        <div class="row g-3">
+          <div class="col-6"><div class="mini-card h-100"><div class="mini-card-icon mb-2">🔍</div><div class="mini-card-title mb-1">Real-time</div><div class="mini-card-sub">API Scanning</div></div></div>
+          <div class="col-6"><div class="mini-card h-100"><div class="mini-card-icon mb-2">🧠</div><div class="mini-card-title mb-1">Intelligence</div><div class="mini-card-sub">Risk Engine</div></div></div>
+          <div class="col-6"><div class="mini-card h-100"><div class="mini-card-icon mb-2">📊</div><div class="mini-card-title mb-1">0–100</div><div class="mini-card-sub">Exposure Score</div></div></div>
+          <div class="col-6"><div class="mini-card h-100"><div class="mini-card-icon mb-2">💡</div><div class="mini-card-title mb-1">Smart</div><div class="mini-card-sub">Recommendations</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="py-5">
+  <div class="container py-4 py-lg-5">
+    <div class="section-title text-center mb-2 reveal">How It <span>Works</span></div>
+    <div class="section-subtitle text-center mb-5 reveal">Three simple steps to protect your digital identity</div>
+    <div class="row g-4 position-relative">
+      <div class="steps-line d-none d-lg-block"><div class="steps-line-fill" id="steps-line-fill"></div></div>
+      <div class="col-lg-4 reveal">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-icon-wrap mb-4">📝</div>
+          <div class="step-title mb-2">Create Account</div>
+          <div class="step-desc">Register free in under 30 seconds. No credit card required.</div>
+          <div class="step-action mt-3"><button class="btn-step" onclick="switchTab('register');openModal()">Register Now →</button></div>
+        </div>
+      </div>
+      <div class="col-lg-4 reveal reveal-delay-2">
+        <div class="step-card step-card-active">
+          <div class="step-num">02</div>
+          <div class="step-icon-wrap mb-4">🔍</div>
+          <div class="step-title mb-2">Enter Your Email</div>
+          <div class="step-desc">We scan 10B+ breach records instantly across 500+ known databases.</div>
+          <div class="step-action mt-3"><button class="btn-step" onclick="requireLogin(event,'/scanner')">Scan Now →</button></div>
+        </div>
+      </div>
+      <div class="col-lg-4 reveal reveal-delay-3">
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-icon-wrap mb-4">🛡️</div>
+          <div class="step-title mb-2">Get Your Report</div>
+          <div class="step-desc">Risk score + smart recommendations delivered in seconds.</div>
+          <div class="step-action mt-3"><button class="btn-step" onclick="requireLogin(event,'/dashboard')">View Dashboard →</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="py-5">
+  <div class="container py-4 py-lg-5">
+    <div class="section-title text-center mb-2 reveal">Everything You Need to <span>Stay Protected</span></div>
+    <div class="section-subtitle text-center mb-5 reveal">Enterprise-grade security tools, free for everyone</div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4 reveal">
+        <div class="feature-card fc-green h-100"><div class="card-light"></div>
+          <div class="feature-icon-box mb-3">🔍</div>
+          <div class="feature-title mb-2">Real-time Breach Detection</div>
+          <div class="feature-desc">Instant alerts the moment your data appears in a new breach database — before criminals act on it.</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 reveal reveal-delay-1">
+        <div class="feature-card fc-cyan h-100"><div class="card-light"></div>
+          <div class="feature-icon-box mb-3">🧠</div>
+          <div class="feature-title mb-2">Risk Intelligence Engine</div>
+          <div class="feature-desc">Our scoring engine weighs breach severity, recency, and data sensitivity to produce your unique risk profile.</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 reveal reveal-delay-2">
+        <div class="feature-card fc-violet h-100"><div class="card-light"></div>
+          <div class="feature-icon-box mb-3">📊</div>
+          <div class="feature-title mb-2">Animated Risk Score Meter</div>
+          <div class="feature-desc">Visual exposure meter from 0–100 helps you understand your risk at a glance, updated in real time.</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 reveal reveal-delay-1">
+        <div class="feature-card fc-green h-100"><div class="card-light"></div>
+          <div class="feature-icon-box mb-3">💡</div>
+          <div class="feature-title mb-2">Smart Recommendations</div>
+          <div class="feature-desc">Personalized, step-by-step guidance to remediate each breach and harden your digital defenses.</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 reveal reveal-delay-2">
+        <div class="feature-card fc-purple h-100"><div class="card-light"></div>
+          <div class="feature-icon-box mb-3">📈</div>
+          <div class="feature-title mb-2">Full Scan History</div>
+          <div class="feature-desc">Track your security posture over time. See how your exposure changes as you take protective actions.</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4 reveal reveal-delay-3">
+        <div class="feature-card fc-cyan h-100"><div class="card-light"></div>
+          <div class="feature-icon-box mb-3">🔐</div>
+          <div class="feature-title mb-2">Secure &amp; Private</div>
+          <div class="feature-desc">We never store your password. All scans are encrypted end-to-end. Your data stays yours.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THREAT COUNTER SECTION (NEW) -->
+<section id="threat-counter" class="py-5">
+  <div class="container py-3">
+    <div class="threat-counter-card reveal">
+      <div class="threat-counter-bg"></div>
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <div class="threat-label mb-2">⚠️ REAL-TIME GLOBAL THREAT MONITOR</div>
+          <h3 class="threat-title">Attacks Happening<br>Right <span>Now</span></h3>
+          <p class="threat-sub">Every second, thousands of credentials are being tested, stolen, or sold on dark web markets.</p>
+        </div>
+        <div class="col-lg-6">
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="threat-stat-box">
+                <div class="threat-live-num" id="attacks-today">0</div>
+                <div class="threat-stat-label">Attacks Today</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="threat-stat-box">
+                <div class="threat-live-num red-num" id="records-stolen">0</div>
+                <div class="threat-stat-label">Records Stolen (2024)</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="threat-stat-box">
+                <div class="threat-live-num cyan-num" id="scans-done">0</div>
+                <div class="threat-stat-label">Scans Performed</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="threat-stat-box">
+                <div class="threat-live-num violet-num" id="users-protected">0</div>
+                <div class="threat-stat-label">Users Protected</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="py-5">
+  <div class="container py-4 py-lg-5 text-center">
+    <div class="reveal">
+      <div class="cta-tag mb-4">FIND OUT NOW</div>
+      <div class="cta-heading mb-3">Is Your Email<br><span class="cta-red">Compromised?</span></div>
+      <p class="cta-sub mb-5">Check in 10 seconds. Free scan. No credit card.</p>
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <button class="btn-cta" onclick="requireLogin(event,'/scanner')">🔍 Scan My Email — It's Free →</button>
+        <button class="btn-cta-outline" onclick="openModal('/register')">Create Free Account</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="footer" class="py-4">
+  <div class="container">
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <svg width="28" height="32" viewBox="0 0 40 44" fill="none" class="shield-pulse">
+            <path d="M20 2L4 9V22C4 31.4 11 40.1 20 42C29 40.1 36 31.4 36 22V9L20 2Z" fill="rgba(0,255,136,0.12)" stroke="#00ff88" stroke-width="1.5"/>
+            <path d="M16 21L19 24L25 18" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="brand-text">IDENTITY<span>SHIELD</span></span>
+        </div>
+        <p class="footer-desc">Protecting digital identities with real-time breach detection and intelligent risk analysis.</p>
+      </div>
+      <div class="col-md-2">
+        <div class="footer-heading mb-3">PLATFORM</div>
+        <a href="/scanner" onclick="requireLogin(event,'/scanner')" class="footer-link d-block mb-2">Scan Email</a>
+        <a href="/dashboard" onclick="requireLogin(event,'/dashboard')" class="footer-link d-block mb-2">Dashboard</a>
+        <a href="/awareness" class="footer-link d-block mb-2">Awareness</a>
+      </div>
+      <div class="col-md-2">
+        <div class="footer-heading mb-3">COMPANY</div>
+        <a href="/" class="footer-link d-block mb-2">About Us</a>
+        <a href="/contact" class="footer-link d-block mb-2">Contact</a>
+        <a href="#" class="footer-link d-block mb-2">Privacy Policy</a>
+      </div>
+      <div class="col-md-4">
+        <div class="footer-heading mb-3">GET IN TOUCH</div>
+        <a href="mailto:identityshield.support@gmail.com" class="footer-link d-block mb-2"><i class="fas fa-envelope me-2"></i>identityshield.support@gmail.com</a>
+        <div class="footer-link mb-3"><i class="fas fa-map-marker-alt me-2"></i>Jodhpur, Rajasthan, India</div>
+        <div class="footer-social-icons">
+        <a href="#" class="footer-social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="footer-social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="footer-social-icon" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" class="footer-social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="mb-0">© 2026 <span>IdentityShield</span> — All Rights Reserved &nbsp;·&nbsp; Designed &amp; developed with <span class="heart">♥</span> by <span>Kiran &amp; Tanisha</span></p>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast Notification -->
+<div id="toast-notification" class="toast-notify">
+  <div class="toast-icon" id="toast-icon">✓</div>
+  <div class="toast-msg" id="toast-msg">Logged in successfully!</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

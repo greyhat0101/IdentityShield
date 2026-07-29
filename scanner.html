@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IdentityShield — Email Breach Scanner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  
+  <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/scanner.css') }}">
+</head>
+<body>
+<div class="grid-overlay"></div>
+ 
+<!-- TICKER BAR -->
+<div id="ticker-bar">
+  <div class="ticker-live">LIVE</div>
+  <div class="ticker-wrapper">
+    <div class="ticker-content">
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Adobe Breach: 153M records exposed</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>LinkedIn: 700M accounts on dark web</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Yahoo Breach: 3 Billion accounts affected</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>Security patch released for critical CVE-2025-0342</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Equifax: 147M Social Security numbers leaked</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>New ransomware variant targeting healthcare systems</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>CISA issues emergency directive for zero-day vulnerability</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Facebook: 533M phone numbers exposed in 2024 dump</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>Phishing campaigns up 340% in Q1 2025</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>MFA now mandatory for federal agencies</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Adobe Breach: 153M records exposed</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>LinkedIn: 700M accounts on dark web</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Yahoo Breach: 3 Billion accounts affected</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>Security patch released for critical CVE-2025-0342</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Equifax: 147M Social Security numbers leaked</span>
+    </div>
+  </div>
+</div>
+ 
+<!-- NAVBAR -->
+<nav id="main-nav">
+  <div class="d-flex align-items-center gap-3">
+    <a href="/" class="d-flex align-items-center gap-3 text-decoration-none">
+      <div class="nav-logo">
+        <svg viewBox="0 0 40 44" fill="none" class="shield-pulse">
+          <path d="M20 2L4 9V22C4 31.4 11 40.1 20 42C29 40.1 36 31.4 36 22V9L20 2Z" fill="rgba(0,255,136,0.12)" stroke="#00ff88" stroke-width="1.5"/>
+          <path d="M16 21L19 24L25 18" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="brand-text">IDENTITY<span>SHIELD</span></div>
+    </a>
+  </div>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/scanner" class="active">Scan</a>
+    <a href="/awareness">Awareness</a>
+    <a href="/contact">Contact</a>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <div id="nav-profile-area" style="position:relative;">
+      <button class="btn-profile" onclick="toggleProfileDropdown()">
+        <div class="profile-avatar" id="nav-avatar">U</div>
+        <span id="nav-username" class="d-none d-sm-inline">User</span>
+        <i class="fas fa-chevron-down ms-1" style="font-size:10px;"></i>
+      </button>
+      <div class="profile-dropdown" id="profile-dropdown">
+        <div class="profile-dropdown-header">
+          <div class="profile-dropdown-avatar" id="dropdown-avatar">U</div>
+          <div>
+            <div class="profile-dropdown-name" id="dropdown-name">User</div>
+            <div class="profile-dropdown-email" id="dropdown-email"></div>
+          </div>
+        </div>
+        <div class="profile-dropdown-divider"></div>
+        <a href="/dashboard" class="profile-dropdown-item"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="/scanner" class="profile-dropdown-item"><i class="fas fa-search"></i> Scan Email</a>
+        <div class="profile-dropdown-divider"></div>
+        <a href="#" onclick="logoutUser()" class="profile-dropdown-item text-danger-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+    <button class="hamburger" onclick="toggleMobile()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+ 
+<div id="mobile-menu">
+  <button class="menu-close" onclick="toggleMobile()"><i class="fas fa-times"></i></button>
+  <a href="/" onclick="toggleMobile()">Home</a>
+  <a href="/scanner" onclick="toggleMobile()">Scan</a>
+  <a href="/awareness" onclick="toggleMobile()">Awareness</a>
+  <a href="/contact" onclick="toggleMobile()">Contact</a>
+</div>
+ 
+<!-- SCANNER HERO -->
+<section class="scanner-hero">
+  <canvas id="scan-canvas"></canvas>
+  <div class="scanner-hero-content">
+    <div class="scanner-badge">🔍 BREACH DETECTION ENGINE</div>
+    <h1 class="scanner-title">Scan Your <span>Email</span><br>For Data Breaches</h1>
+    <p class="scanner-subtitle">Instantly check against 10B+ compromised records across 500+ known breach databases</p>
+  </div>
+</section>
+ 
+<!-- MAIN SCANNER -->
+<section class="scanner-main">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+ 
+        <!-- SCAN FORM CARD -->
+        <div class="scan-form-card reveal" id="scan-form-section">
+          <div class="scan-form-glow"></div>
+          <div class="scan-form-header">
+            <div class="scan-form-icon">🛡️</div>
+            <div>
+              <div class="scan-form-title">Identity Breach Scanner</div>
+              <div class="scan-form-sub">Enter your email to check for exposure</div>
+            </div>
+          </div>
+ 
+          <div class="scan-input-group">
+            <i class="fas fa-envelope scan-input-icon"></i>
+            <input type="email" class="scan-input" id="scan-email" placeholder="Enter your email address..." autocomplete="off"/>
+            <button class="scan-clear-btn" id="scan-clear" onclick="clearScanInput()" style="display:none;" title="Clear"><i class="fas fa-times"></i></button>
+          </div>
+ 
+          <div class="platform-label">Select Platform (Optional)</div>
+          <div class="platform-grid" id="platform-grid">
+            <div class="platform-chip" data-platform="gmail"><i class="fab fa-google"></i> <span class="d-none d-sm-inline">Gmail</span></div>
+            <div class="platform-chip" data-platform="facebook"><i class="fab fa-facebook"></i> <span class="d-none d-sm-inline">Facebook</span></div>
+            <div class="platform-chip" data-platform="instagram"><i class="fab fa-instagram"></i> <span class="d-none d-sm-inline">Instagram</span></div>
+            <div class="platform-chip" data-platform="linkedin"><i class="fab fa-linkedin"></i> <span class="d-none d-sm-inline">Linkedin</span></div>
+            <div class="platform-chip" data-platform="github"><i class="fab fa-github"></i> <span class="d-none d-sm-inline">Github</span></div>
+            <div class="platform-chip" data-platform="twitter"><i class="fab fa-twitter"></i> <span class="d-none d-sm-inline">Twitter</span></div>
+            <div class="platform-chip" data-platform="outlook"><i class="fab fa-microsoft"></i> <span class="d-none d-sm-inline">Microsoft</span></div>
+            <div class="platform-chip" data-platform="yahoo"><i class="fab fa-yahoo"></i> <span class="d-none d-sm-inline">Yahoo</span></div>
+            <div class="platform-chip" data-platform="other"><i class="fas fa-globe"></i> <span class="d-none d-sm-inline">Other</span></div>
+          </div>
+ 
+          <button class="btn-scan-now" id="scan-btn" onclick="startScan()">
+            <span id="scan-btn-text"><i class="fas fa-search me-2"></i>SCAN NOW</span>
+            <span id="scan-btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin me-2"></i>Scanning...</span>
+          </button>
+        </div>
+ 
+        <!-- LOADING ANIMATION -->
+        <div class="scan-loading-card reveal" id="scan-loading" style="display:none;">
+          <div class="scan-loading-radar">
+            <div class="radar-ring r1"></div>
+            <div class="radar-ring r2"></div>
+            <div class="radar-ring r3"></div>
+            <div class="radar-sweep"></div>
+            <div class="radar-center"><i class="fas fa-search"></i></div>
+          </div>
+          <div class="scan-loading-steps">
+            <div class="loading-step active" id="lstep1"><span class="step-dot"></span> <span>Scanning breach databases...</span></div>
+            <div class="loading-step" id="lstep2"><span class="step-dot"></span> <span>Checking exposure records...</span></div>
+            <div class="loading-step" id="lstep3"><span class="step-dot"></span> <span>Generating risk report...</span></div>
+          </div>
+        </div>
+ 
+        <!-- RESULTS: SAFE -->
+        <div class="scan-result-card result-safe reveal" id="result-safe" style="display:none;">
+          <div class="result-safe-glow"></div>
+          <div class="result-icon-wrap safe-icon">✅</div>
+          <div class="result-title">No Breaches Found!</div>
+          <div class="result-email-shown" id="safe-email-shown"></div>
+          <div class="result-safe-desc">Great news! Your email address was not found in any known data breach databases. Your digital identity appears to be secure.</div>
+          <div class="risk-meter-wrap">
+            <div class="risk-label-row"><span>Risk Score</span><span class="risk-score-val" id="safe-score">5/100</span></div>
+            <div class="risk-bar-track"><div class="risk-bar-fill safe-fill" id="safe-bar" style="width:0%"></div></div>
+            <div class="risk-level-tag safe-tag">🟢 LOW RISK</div>
+          </div>
+          <div class="result-recommendations">
+            <div class="rec-title">✓ Keep These Good Habits</div>
+            <div class="rec-grid">
+              <div class="rec-item safe-rec"><i class="fas fa-check-circle"></i> <span>Use strong unique passwords</span></div>
+              <div class="rec-item safe-rec"><i class="fas fa-check-circle"></i> <span>Enable 2FA on all accounts</span></div>
+              <div class="rec-item safe-rec"><i class="fas fa-check-circle"></i> <span>Monitor regularly</span></div>
+              <div class="rec-item safe-rec"><i class="fas fa-check-circle"></i> <span>Use a password manager</span></div>
+            </div>
+          </div>
+          <button class="btn-view-dashboard" onclick="window.location.href='/dashboard'">
+            <i class="fas fa-chart-line me-2"></i>View Your Dashboard →
+          </button>
+        </div>
+ 
+        <!-- RESULTS: BREACH FOUND -->
+        <div class="scan-result-card result-breach reveal" id="result-breach" style="display:none;">
+          <div class="result-breach-glow"></div>
+          <div class="result-icon-wrap breach-icon">⚠️</div>
+          <div class="result-title breach-title">Breaches Detected!</div>
+          <div class="result-email-shown" id="breach-email-shown"></div>
+ 
+          <div class="breach-stats-row">
+            <div class="breach-stat-box">
+              <div class="breach-stat-num" id="breach-count-display">0</div>
+              <div class="breach-stat-label">Breaches Found</div>
+            </div>
+            <div class="breach-stat-box">
+              <div class="breach-stat-num cyan-num" id="breach-records-display">0</div>
+              <div class="breach-stat-label">Records Exposed</div>
+            </div>
+            <div class="breach-stat-box">
+              <div class="breach-stat-num violet-num" id="breach-score-display">0/100</div>
+              <div class="breach-stat-label">Risk Score</div>
+            </div>
+          </div>
+ 
+          <div class="risk-meter-wrap">
+            <div class="risk-label-row"><span>Risk Level</span><span class="risk-score-val" id="breach-score">75/100</span></div>
+            <div class="risk-bar-track"><div class="risk-bar-fill breach-fill" id="breach-bar" style="width:0%"></div></div>
+            <div class="risk-level-tag" id="risk-tag">🔴 HIGH RISK</div>
+          </div>
+ 
+          <div class="breached-sites-section">
+            <div class="breached-sites-title">Compromised Platforms</div>
+            <div class="breached-sites-list" id="breached-sites-list"></div>
+          </div>
+ 
+          <div class="result-recommendations">
+            <div class="rec-title">⚡ Immediate Actions Required</div>
+            <div class="rec-grid">
+              <div class="rec-item danger-rec"><i class="fas fa-key"></i> <span>Change Password Immediately</span></div>
+              <div class="rec-item danger-rec"><i class="fas fa-mobile-alt"></i> <span>Enable MFA / 2FA</span></div>
+              <div class="rec-item warning-rec"><i class="fas fa-history"></i> <span>Check Login Activity</span></div>
+              <div class="rec-item warning-rec"><i class="fas fa-lock"></i> <span>Use Unique Passwords</span></div>
+              <div class="rec-item warning-rec"><i class="fas fa-bell"></i> <span>Set Up Breach Alerts</span></div>
+              <div class="rec-item warning-rec"><i class="fas fa-envelope"></i> <span>Update Recovery Email</span></div>
+            </div>
+          </div>
+ 
+          <button class="btn-view-dashboard" onclick="window.location.href='/dashboard'">
+            <i class="fas fa-chart-line me-2"></i>View Your Full Dashboard →
+          </button>
+        </div>
+ 
+        <!-- SCAN AGAIN -->
+        <div class="scan-again-wrap reveal" id="scan-again" style="display:none;">
+          <button class="btn-scan-again" onclick="resetScanner()"><i class="fas fa-redo me-2"></i>Scan Another Email</button>
+        </div>
+ 
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- INFO CARDS -->
+<section class="scanner-info-section">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4 col-sm-6 reveal">
+        <div class="info-card">
+          <div class="info-icon">🔍</div>
+          <div class="info-title">How It Works</div>
+          <div class="info-desc">We cross-reference your email against the XposedOrNot API database of 10B+ leaked records from 500+ breaches worldwide.</div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-6 reveal reveal-delay-1">
+        <div class="info-card">
+          <div class="info-icon">🔒</div>
+          <div class="info-title">Is It Safe?</div>
+          <div class="info-desc">Yes. We only check if your email exists in breach records. We never store your email permanently or require your password.</div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-6 reveal reveal-delay-2">
+        <div class="info-card">
+          <div class="info-icon">⚡</div>
+          <div class="info-title">What Happens Next?</div>
+          <div class="info-desc">If breaches are found, follow the recommendations immediately. Change passwords, enable 2FA, and monitor your accounts.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<!-- FOOTER -->
+<footer id="footer" class="py-4">
+  <div class="container">
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <svg width="28" height="32" viewBox="0 0 40 44" fill="none" class="shield-pulse">
+            <path d="M20 2L4 9V22C4 31.4 11 40.1 20 42C29 40.1 36 31.4 36 22V9L20 2Z" fill="rgba(0,255,136,0.12)" stroke="#00ff88" stroke-width="1.5"/>
+            <path d="M16 21L19 24L25 18" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="brand-text">IDENTITY<span>SHIELD</span></span>
+        </div>
+        <p class="footer-desc">Protecting digital identities with real-time breach detection and intelligent risk analysis.</p>
+      </div>
+      <div class="col-md-2">
+        <div class="footer-heading mb-3">PLATFORM</div>
+        <a href="/scanner" onclick="requireLogin(event,'/scanner')" class="footer-link d-block mb-2">Scan Email</a>
+        <a href="/dashboard" onclick="requireLogin(event,'/dashboard')" class="footer-link d-block mb-2">Dashboard</a>
+        <a href="/awareness" class="footer-link d-block mb-2">Awareness</a>
+      </div>
+      <div class="col-md-2">
+        <div class="footer-heading mb-3">COMPANY</div>
+        <a href="/index" class="footer-link d-block mb-2">About Us</a>
+        <a href="/contact" class="footer-link d-block mb-2">Contact</a>
+        <a href="#" class="footer-link d-block mb-2">Privacy Policy</a>
+      </div>
+      <div class="col-md-4">
+        <div class="footer-heading mb-3">GET IN TOUCH</div>
+        <a href="mailto:identityshield.support@gmail.com" class="footer-link d-block mb-2"><i class="fas fa-envelope me-2"></i>identityshield.support@gmail.com</a>
+        <div class="footer-link mb-3"><i class="fas fa-map-marker-alt me-2"></i>Jodhpur, Rajasthan, India</div>
+        <div class="footer-social-icons">
+         <a href="#" class="footer-social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="footer-social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="footer-social-icon" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="#" class="footer-social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="mb-0">© 2026 <span>IdentityShield</span> — All Rights Reserved &nbsp;·&nbsp; Designed &amp; developed with <span class="heart">♥</span> by <span>Kiran &amp; Tanisha</span></p>
+    </div>
+  </div>
+</footer>
+ 
+<div id="toast-notification" class="toast-notify">
+  <div class="toast-icon" id="toast-icon">✓</div>
+  <div class="toast-msg" id="toast-msg">Done!</div>
+</div>
+ 
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/scanner.js') }}"></script>
+
+</body>
+</html>

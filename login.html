@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IdentityShield — Protect Your Digital Identity</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- GRID OVERLAY -->
+<div class="grid-overlay"></div>
+
+<!-- SCAN BLOCKED OVERLAY (shown when not logged in, user tries to access scan) -->
+<div id="blocked-overlay">
+  <div class="blocked-card">
+    <div class="blocked-icon">🔒</div>
+    <div class="blocked-title">LOGIN REQUIRED</div>
+    <div class="blocked-sub">You must be logged in to scan for breaches</div>
+    <button class="btn-blocked-login" onclick="openModal()">Login Now</button>
+  </div>
+</div>
+
+<!-- TICKER BAR -->
+<div id="ticker-bar">
+  <div class="ticker-live">LIVE</div>
+  <div class="ticker-wrapper">
+    <div class="ticker-content">
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Adobe Breach: 153M records exposed</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>LinkedIn: 700M accounts on dark web</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Yahoo Breach: 3 Billion accounts affected</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>Security patch released for critical CVE-2025-0342</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Equifax: 147M Social Security numbers leaked</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>New ransomware variant targeting healthcare systems</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>CISA issues emergency directive for zero-day vulnerability</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Facebook: 533M phone numbers exposed in 2024 dump</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>Phishing campaigns up 340% in Q1 2025</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>MFA now mandatory for federal agencies</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Adobe Breach: 153M records exposed</span>
+      <span class="ticker-item warning"><span class="ticker-dot"></span>LinkedIn: 700M accounts on dark web</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Yahoo Breach: 3 Billion accounts affected</span>
+      <span class="ticker-item update"><span class="ticker-dot"></span>Security patch released for critical CVE-2025-0342</span>
+      <span class="ticker-item breach"><span class="ticker-dot"></span>Equifax: 147M Social Security numbers leaked</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="main-nav">
+  <div class="d-flex align-items-center gap-3">
+    <div class="nav-logo">
+      <svg viewBox="0 0 40 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="shield-pulse">
+        <path d="M20 2L4 9V22C4 31.4 11 40.1 20 42C29 40.1 36 31.4 36 22V9L20 2Z" fill="rgba(0,255,136,0.12)" stroke="#00ff88" stroke-width="1.5"/>
+        <path d="M20 8L10 13V22C10 27.8 14.5 33.2 20 34.8C25.5 33.2 30 27.8 30 22V13L20 8Z" fill="rgba(0,255,136,0.08)" stroke="#00ff88" stroke-width="1" opacity="0.6"/>
+        <path d="M16 21L19 24L25 18" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="brand-text">IDENTITY<span>SHIELD</span></div>
+  </div>
+
+  <div class="nav-links">
+    <a href="/" class="active">Home</a>
+    <a href="/scanner" onclick="requireLogin(event, '/scanner')">Scan</a>
+    <a href="/awareness">Awareness</a>
+    <a href="/contact">Contact</a>
+  </div>
+
+  <div class="d-flex align-items-center gap-2">
+    <!-- LOGGED OUT: show Login button -->
+    <div id="nav-login-area">
+      <button class="btn-login px-3 py-2" onclick="openModal()">
+        <i class="fas fa-lock me-1"></i> Login
+      </button>
+    </div>
+    <!-- LOGGED IN: show profile dropdown (hidden by default) -->
+    <div id="nav-profile-area" style="display:none; position:relative;">
+      <button class="btn-profile" onclick="toggleProfileDropdown()">
+        <div class="profile-avatar" id="nav-avatar">K</div>
+        <span id="nav-username">Kiran</span>
+        <i class="fas fa-chevron-down ms-1" style="font-size:10px;"></i>
+      </button>
+      <div class="profile-dropdown" id="profile-dropdown">
+        <div class="profile-dropdown-header">
+          <div class="profile-dropdown-avatar" id="dropdown-avatar">K</div>
+          <div>
+            <div class="profile-dropdown-name" id="dropdown-name">Kiran</div>
+            <div class="profile-dropdown-email" id="dropdown-email">kiran@email.com</div>
+          </div>
+        </div>
+        <div class="profile-dropdown-divider"></div>
+        <a href="/dashboard" onclick="requireLogin(event,'/dashboard')" class="profile-dropdown-item">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </a>
+        <a href="/scanner" onclick="requireLogin(event,'/scanner')" class="profile-dropdown-item">
+          <i class="fas fa-search"></i> Scan Email
+        </a>
+        <div class="profile-dropdown-divider"></div>
+        <a href="#" onclick="logoutUser()" class="profile-dropdown-item text-danger-item">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+
+    <button class="hamburger" onclick="toggleMobile()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mobile-menu">
+  <button class="menu-close" onclick="toggleMobile()"><i class="fas fa-times"></i></button>
+  <a href="/" onclick="toggleMobile()">Home</a>
+  <a href="/scanner" onclick="requireLogin(event,'/scanner');toggleMobile();">Scan</a>
+  <a href="/awareness" onclick="toggleMobile()">Awareness</a>
+  <a href="/contact" onclick="toggleMobile()">Contact</a>
+  <button class="btn-login px-4 py-2 mt-3" onclick="openModal();toggleMobile();">Login / Register</button>
+</div>
+
+<!-- LOGIN / REGISTER MODAL -->
+<div id="login-modal">
+  <div class="modal-card">
+    <button class="modal-close" id="modal-close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+
+    <!-- Shield Icon -->
+    <div class="d-flex justify-content-center mb-3">
+      <svg width="52" height="58" viewBox="0 0 40 44" fill="none" class="shield-pulse">
+        <path d="M20 2L4 9V22C4 31.4 11 40.1 20 42C29 40.1 36 31.4 36 22V9L20 2Z" fill="rgba(0,255,136,0.15)" stroke="#00ff88" stroke-width="1.5"/>
+        <path d="M16 21L19 24L25 18" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Tabs -->
+    <div class="modal-tabs mb-4">
+      <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">LOGIN</button>
+      <button class="modal-tab" id="tab-register" onclick="switchTab('register')">REGISTER</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div class="modal-title text-center mb-1">Welcome Back</div>
+      <div class="modal-subtitle text-center mb-4">Secure your digital identity today</div>
+
+      <div class="input-group-custom mb-3">
+        <i class="fas fa-envelope input-icon"></i>
+        <input class="form-input" id="login-email" type="email" placeholder="Email Address" autocomplete="email"/>
+        <div class="input-error" id="err-login-email"></div>
+      </div>
+      <div class="input-group-custom mb-2">
+        <i class="fas fa-lock input-icon"></i>
+        <input class="form-input" id="login-password" type="password" placeholder="Password" autocomplete="current-password"/>
+        <button class="toggle-password" onclick="togglePass('login-password', this)"><i class="fas fa-eye"></i></button>
+        <div class="input-error" id="err-login-password"></div>
+      </div>
+	  <div class="d-flex align-items-center mb-3">
+		<input type="checkbox" id="remember-me" style="margin-right:8px;"/>
+		<label for="remember-me" class="modal-link" style="font-size:12px;">Remember me</label>
+	  </div>
+      <div class="d-flex justify-content-end mb-3">
+        <a href="#" class="modal-link" style="font-size:11px;">Forgot Password?</a>
+      </div>
+      <div class="form-error-banner" id="login-error-banner"></div>
+      <button class="btn-modal-login py-3" onclick="submitLogin()">
+        <span id="login-btn-text"><i class="fas fa-shield-alt me-2"></i>LOGIN SECURELY</span>
+        <span id="login-btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin me-2"></i>Verifying...</span>
+      </button>
+      <div class="modal-footer-text mt-3 text-center">
+        Don't have an account? <a href="/register" class="modal-link" onclick="switchTab('register')">Register Free</a>
+      </div>
+    </div>
+
+    
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
