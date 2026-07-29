@@ -1,0 +1,30 @@
+# Environment variables — NEVER commit this
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Database — contains real user data
+Database/*.db
+
+# Virtual environment
+venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test-email.py
+
+# Compiled files
+*.egg-info/
+dist/
+build/
