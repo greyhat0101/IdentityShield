@@ -20,7 +20,7 @@ app.config['SESSION_COOKIE_SECURE'] = False #'True' for production
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=365)
 mail = Mail(app)
 
-DB = 'Database/identity_shield.db'
+DB = 'database/identity_shield.db'
 
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -1072,4 +1072,4 @@ def logout():
 
 if __name__ == '__main__':
     init_db()
-    app.run((host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
