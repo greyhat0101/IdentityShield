@@ -46,7 +46,7 @@
       <div class="brand-text">IDENTITY<span>SHIELD</span></div>
     </a>
   </div>
-  <div class="nav-links"><a href="/">Home</a><a href="/scanner">Scan</a><a href="/awareness">Awareness</a><a href="/contact" class="active">Contact</a></div>
+  <div class="nav-links"><a href="/">Home</a><a href="/scanner" onclick="requireLogin(event, '/scanner')">Scan</a><a href="/awareness">Awareness</a><a href="/contact" class="active">Contact</a></div>
   <div class="d-flex align-items-center gap-2">
     <div id="nav-login-area"><button class="btn-login px-3 py-2" onclick="openModal()"><i class="fas fa-lock me-1"></i> Login</button></div>
     <div id="nav-profile-area" style="display:none;position:relative;">
