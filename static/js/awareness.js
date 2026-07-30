@@ -252,7 +252,7 @@ function loadCommonThreats(){
   var threatsHtml = '';
   var threats = [
     {
-      icon: '🛑',
+      icon: <i class="fas fa-shield-virus"></i>,
       name: 'Ransomware',
       desc: 'Malware that encrypts your files and demands payment for decryption.',
       protection: 'Keep backups. Don\'t pay ransom. Report to authorities.'
